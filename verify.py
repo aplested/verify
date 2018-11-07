@@ -13,7 +13,7 @@ if __name__ == "__main__":
     else:
         from tkinter import *
 
-    from GUI.verifyTK import *
+    from verifyTk import *
     # initiate main frame
     master = Tk()
     app = verifyGUI(master)

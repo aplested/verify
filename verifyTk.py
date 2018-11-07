@@ -12,7 +12,6 @@ __author__="Andrew"
 __date__ ="$07-Nov-2018$"
 
 
-
 class verifyGUI:
     def __init__(self, master):
         self.master = master

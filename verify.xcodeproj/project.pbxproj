@@ -8,15 +8,15 @@
 
 /* Begin PBXFileReference section */
 		49D7D8CA2193164F001AA46D /* verify.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = verify.py; sourceTree = "<group>"; };
-		49D7D8CB2193164F001AA46D /* GUI */ = {isa = PBXFileReference; lastKnownFileType = folder; path = GUI; sourceTree = "<group>"; };
+		49D7D8CC219318AD001AA46D /* verifyTk.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = verifyTk.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		49D7D8BF2193150B001AA46D = {
 			isa = PBXGroup;
 			children = (
-				49D7D8CB2193164F001AA46D /* GUI */,
 				49D7D8CA2193164F001AA46D /* verify.py */,
+				49D7D8CC219318AD001AA46D /* verifyTk.py */,
 			);
 			sourceTree = "<group>";
 		};
