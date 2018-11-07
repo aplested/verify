@@ -150,7 +150,7 @@ def construct_diffs(input_traces):
 
     num_of_diff_traces = len (difference_traces)
 
-    return input_traces, difference_traces, messages
+    return input_traces, difference_traces, messages, header_line
 
 
 def final_prep(input_traces, difference_traces):
@@ -171,35 +171,27 @@ def final_prep(input_traces, difference_traces):
         final_ensemble_variance.append(2 * mean_dZt_squared)
     
     ## Add Mean and Ensemble variances to output
-    difference_traces.append(final_mean_I_inverted_bs_sub)
-    difference_traces.append(final_ensemble_variance)
+    difference_traces.insert(0, final_mean_I_inverted_bs_sub)
+    difference_traces.insert(1, final_ensemble_variance)
 
     return difference_traces
     
-def write_output (difference_traces, filename):
+def write_output (difference_traces, header_line, filename='verified.txt'):
     
     output_lines = traces_into_lines (difference_traces)
 
     ## Finish constructing header line
+    header_line.insert(0, '<I>')
+    header_line.insert(1, '<Variance>')
+    header_line.insert(2, 'Verified Difference Current Traces')
+    header_line.insert(3, 'Traces removed ->')
 
-    header_line.insert(0,'Verified Difference Current Traces')
+    output_lines.insert(0, header_line)
+    output_file = filename
 
-    for x in range(num_of_diff_traces - failed_traces - 1):
-        #Insert correct number of spaces to get to <I> and <Variance>
-        header_line.append('')
-
-    header_line.append('<I>')
-    header_line.append('<Variance>')
-
-
-
-    output_lines.insert(0,header_line)
-    output_file = 'verified.txt'
-
-    print 'Writing',num_of_diff_traces,'difference traces to',output_file,', plus mean and variance in last two columns...'
+    print 'Writing {} difference traces to {} with mean and variance in first two columns...'.format(len(difference_traces), output_file)
 
     file_write (output_file,output_lines)
-
     print 'Done'
 
 
