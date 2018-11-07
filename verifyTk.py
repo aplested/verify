@@ -13,15 +13,31 @@ __date__ ="$07-Nov-2018$"
 
 
 class verifyGUI:
+    introduction = """
+        Verify fluctuations from ion channel noise in difference records
+        according to expectation of not exceeding 7 S.D.
+        from Heinemann and Conti Methods in Enzymology 207
+        Andrew Plested 2006
+        Takes input from tab-delimited Excel file 'file.txt'.
+        Columns are current traces
+        Mean and variance are computed for the set to use in limit calculation
+        Baseline noise is determined for each difference trace from the first hundred points (2 ms at 50 kHz)
+        Traces that exceed the limit are popped from the list and the failing points are explicitly listed to the terminal
+        Output is tab delimited columns of verified traces 'verified.txt'
+        """
+
     def __init__(self, master):
         self.master = master
         frame = Frame(master)
         frame.config(background="#565656")
-        #frame.pack()
+        frame.pack()
         master.title('Verify v. 0.1')    #   Main frame title
         master.config(background="#dcdcdc")
         #master.geometry('450x480')
         menubar = Menu(master)
+        
+        message = Message(frame, text="Noise analysis\n"+self.introduction, justify=LEFT, padx=10, width=500, font=("Helvetica", 12), bg="#dcdcdc")
+        message.grid(row=0, column=0, rowspan=12, columnspan=2, sticky=W)
         
         """statmenu = Menu(menubar,tearoff=0)
         statmenu.add_command(label="Fieller", command=self.on_fieller)
@@ -40,10 +56,10 @@ class verifyGUI:
         
         Label(lframe, text="\nPlease select a test to run:", background="#dcdcdc").pack(anchor=W)
         b2 = Button(lframe, text="Randomisation test : Continuous data", width=30, pady=8, command=self.on_rantest_continuous, highlightbackground="#dcdcdc")
-        b3 = Button(lframe, text="Randomisation test : Binomial data", width=30, pady=8, command=self.on_rantest_binomial, highlightbackground="#dcdcdc")
+        
         b4 = Button(lframe, text="Fieller's theorem for SD of a ratio", width=30, pady=8, command=self.on_fieller, highlightbackground="#dcdcdc")
         b2.pack()
-        b3.pack()
+        
         b4.pack()
         
         Label(lframe, text="", background="#dcdcdc").pack()
@@ -58,11 +74,14 @@ class verifyGUI:
         lframe.pack()
         frame.pack()
         
+        """
+        b3 = Button(frame, text="Load traces from Excel Tab-delimited.txt file", command=self.callback3, highlightbackground="#dcdcdc")
+        b3.grid(row=16, column=0,  sticky=W, padx=30)
         b5 = Button(frame, text="Quit", command=master.quit, width=10, highlightbackground="#dcdcdc", pady=8)
-        b5.pack(anchor=E)
+        b5.grid(row=20, column=0, rowspan=1, columnspan=2, sticky=W)
         
         version = Message(frame, width=350, text="https://github.com/aplested/DC-Stats\n\nPython version: " + sys.version, background="#dcdcdc", font=("Helvetica", 10))
-        version.pack(side=BOTTOM)
+        version.grid(row=22, column=0, rowspan=3, columnspan=2, sticky=W)
         """
         
         if platform() == 'Darwin':
@@ -99,8 +118,29 @@ if __name__ == "__main__":
     print (sys.version) #parentheses necessary in python 3  
     
     #
+    """
     
+    def callback3(self):
+        'Called by TAKE DATA FROM excel button'
+        self.traces, self.dfile = self.read_Data('excel')
+        #dfile contains source data path and filename
+        self.data_source = 'Data from ' + self.dfile
+        #self.e5.delete(0, END)
+        #self.e5.insert(END, '5000')     #reset to low value
+        #self.getResult()
+    
+    def read_Data(self, file_type):
+        """"Asks for a tab delimited text file or excel tab-delim to use in randomization test.
+        file_type :string, can be txt or excel
+        """
+            
+        data_file_name = tkFileDialog.askopenfilename()
+        #Convert file into lines of tab delimited text
+        traces = file_tools.file_read(data_file_name, file_type)
+        
+        # Imagine taking a header here, with data titles?
 
+        return traces, data_file_name
 
 
 
