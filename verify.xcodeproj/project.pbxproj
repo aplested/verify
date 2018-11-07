@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		49D7D8CA2193164F001AA46D /* verifyx.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = verifyx.py; sourceTree = "<group>"; };
+		49D7D8CA2193164F001AA46D /* verify.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = verify.py; sourceTree = "<group>"; };
 		49D7D8CC219318AD001AA46D /* verifyTk.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = verifyTk.py; sourceTree = "<group>"; };
 		49D7D8CD2193192E001AA46D /* file_tools.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = file_tools.py; sourceTree = "<group>"; };
 		49D7D8CE2193192E001AA46D /* trace_tools.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = trace_tools.py; sourceTree = "<group>"; };
@@ -19,7 +19,7 @@
 		49D7D8BF2193150B001AA46D = {
 			isa = PBXGroup;
 			children = (
-				49D7D8CA2193164F001AA46D /* verifyx.py */,
+				49D7D8CA2193164F001AA46D /* verify.py */,
 				49D7D8D02193195D001AA46D /* noise.py */,
 				49D7D8CC219318AD001AA46D /* verifyTk.py */,
 				49D7D8CD2193192E001AA46D /* file_tools.py */,

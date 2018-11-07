@@ -2,7 +2,7 @@ import sys,os
 
 def file_read (file):
 	"""Strip lines of ASCII text from file"""
-	print ('Reading',file,'....')
+	print ('Reading '+file+'....')
 	f=open(file, 'r')
 	block_lines = f.read()
 	f.close()							#close the file	
