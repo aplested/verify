@@ -21,13 +21,16 @@ __date__ ="$07-Nov-2018$"
 
 class verifyGUI:
     introduction = """
-        Verify fluctuations from ion channel noise in difference records according to expectation of not exceeding 7 S.D.
-        from Heinemann and Conti Methods in Enzymology 207
+        Verify fluctuations from ion channel noise in difference records
+        ----------------------------------------------------------------
+        according to expectation of not exceeding 7 SD
+        from Heinemann and Conti 'Methods in Enzymology' 207
         Takes input from tab-delimited Excel file 'file.txt' with columns being current traces
         Mean and variance are computed for the set to use in noise limit test
         Baseline noise is determined for each difference trace from the first hundred points (2 ms at 50 kHz)
-        Traces that exceed the limit are popped from the list and the failing points are explicitly listed to the terminal
-        Output is tab delimited text file with columns consisting of verified traces 'verified.txt'
+        Traces with extremely noisy baselines are removed
+        Traces that exceed the 7 SD limit are removed and the failing points are explicitly listed to the terminal
+        Output is tab delimited text file with columns consisting of mean, variance and verified difference traces, default to 'verified.txt'
         """
 
     def __init__(self, master):
@@ -75,7 +78,23 @@ class verifyGUI:
         self.l1.grid(row=14, column=1, columnspan=3, pady=5, sticky=E)
         
         Label(frame, text="Unitary current amplitude (pA):", bg="#dcdcdc").grid(row=18, column=1, pady=5, sticky=E)
+        Label(frame, text="Output file format:", bg="#dcdcdc").grid(row=19, column=0, pady=5, sticky=E)
+
+        MODES = [
+                 ("verified.txt", 0),
+                 ("v_input", 1),
+                 ("Timestamp_v_Input", 2),
+                 ("User", 3)
+                 ]
+
+        v = IntVar()
+        for text, mode in MODES:
+            b = Radiobutton(frame, text=text,
+            variable=v, value=mode)
+            b.grid(row=20, column=mode)
         
+        v.set(0) # initialize
+
         #default unitary current is 1 pA
         self.e5 = Entry(frame, justify=CENTER, width=12, highlightbackground="#dcdcdc")
         self.e5.grid(row=18, column=2, sticky=W, pady=5)
@@ -90,10 +109,10 @@ class verifyGUI:
         self.b6.grid(row=22, padx=10,  pady=8, column=2, sticky=W)
         
         message = Message(master, text=self.introduction, justify=LEFT, padx=10, width=600, font=("Helvetica", 12), bg="#dceedc")
-        message.pack(side=BOTTOM)
+        message.pack(side=BOTTOM, fill=X)
         
         version = Message(master, width=600, text="https://github.com/aplested/verify\tPython version: " + sys.version, background="#99dcee", font=("Helvetica", 10))
-        version.pack(side=BOTTOM)
+        version.pack(side=BOTTOM, fill=X)
     
     
 
