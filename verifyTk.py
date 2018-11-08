@@ -7,7 +7,7 @@ from noise import *
 
 if sys.version_info[0] < 3:
     from Tkinter import *
-    from ttk import Separator
+    from ttk import Separator, Radiobutton
     import tkFileDialog
     #print (str(sys.version_info) +" Tkinter")
 else:
@@ -49,7 +49,7 @@ class verifyGUI:
         frame.pack()
         master.title('Verify v. 0.1')    #   Main frame title
         master.config(background="#dcdcdc")
-        master.geometry('640x480')
+        master.geometry('800x480')
         menubar = Menu(master)
         
         self.input_filename_label = StringVar()
@@ -72,33 +72,43 @@ class verifyGUI:
         master.config(menu=menubar)
       """
         b3 = Button(frame, text="Load traces from .txt file", command=self.callback3, highlightbackground="#99dcdc", pady=8)
-        b3.grid(row=14, column=0, columnspan=2, sticky=W)
+        b3.grid(row=1, column=0, columnspan=2, sticky=W)
         
         self.l1 = Label(frame, textvariable=self.input_filename_label, bg="#dcdcdc")
-        self.l1.grid(row=14, column=1, columnspan=3, pady=5, sticky=E)
+        self.l1.grid(row=1, column=1, columnspan=5, pady=5, sticky=E)
         
-        Label(frame, text="Unitary current amplitude (pA):", bg="#dcdcdc").grid(row=18, column=1, pady=5, sticky=E)
+        b1 = Button(frame, text="change baseline range", state=DISABLED, command=self.callback3, highlightbackground="#99dcdc", pady=8)
+        b2 = Button(frame, text="decimation", state=DISABLED, command=self.callback3, highlightbackground="#99dcdc", pady=8)
+        b1.grid(row=10, column=1, columnspan=2, sticky=W)
+        b2.grid(row=10, column=3, columnspan=2, sticky=W)
+        
+        Label(frame, text="Unitary current amplitude (pA):", bg="#dcdcdc").grid(row=18, column=0, pady=5, sticky=E)
+        self.e5 = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
+        self.e5.grid(row=18, column=1, sticky=W, pady=5)
+        self.e5.insert(END, '1')
+        
         Label(frame, text="Output file format:", bg="#dcdcdc").grid(row=19, column=0, pady=5, sticky=E)
 
         MODES = [
                  ("verified.txt", 0),
-                 ("v_input", 1),
-                 ("Timestamp_v_Input", 2),
-                 ("User", 3)
+                 ("v_[input]", 2),
+                 ("Timestamp_v_[input]", 3),
+                 ("User", 1)
                  ]
 
-        v = IntVar()
+        self.v = IntVar()
+        self.v.set(0) # initialize
+
+        #note this is the ttk radiobutton, the tk one doesn't select at first
         for text, mode in MODES:
-            b = Radiobutton(frame, text=text,
-            variable=v, value=mode)
-            b.grid(row=20, column=mode)
+            b = Radiobutton(frame, text=text, command=self.callback_fname, variable=self.v, value=mode, state=NORMAL)
+            b.grid(row=19, column=mode+1, sticky=W)
+    
         
-        v.set(0) # initialize
+        #frame.update_idletasks()
 
         #default unitary current is 1 pA
-        self.e5 = Entry(frame, justify=CENTER, width=12, highlightbackground="#dcdcdc")
-        self.e5.grid(row=18, column=2, sticky=W, pady=5)
-        self.e5.insert(END, '1')
+        
         
         self.b4 = Button(frame, text="Verify traces variance", state=DISABLED, command=self.callback2, highlightbackground="#dcdcdc")
         self.b4.grid(row=22, padx=10, pady=8, column=0, sticky=W)
@@ -106,7 +116,7 @@ class verifyGUI:
         self.b5.grid(row=22, padx=10, pady=8, column=1, sticky=W)
 
         self.b6 = Button(frame, text="Quit", command=master.quit, width=10, highlightbackground="#dcdcdc")
-        self.b6.grid(row=22, padx=10,  pady=8, column=2, sticky=W)
+        self.b6.grid(row=24, padx=10,  pady=8, column=4, sticky=W)
         
         message = Message(master, text=self.introduction, justify=LEFT, padx=10, width=600, font=("Helvetica", 12), bg="#dceedc")
         message.pack(side=BOTTOM, fill=X)
@@ -119,6 +129,9 @@ class verifyGUI:
     def on_help():
         pass
 
+    def callback_fname(self):
+        print self.v.get()
+    
     def callback5(self):
         'Called by PLOT variance current button.'
         #make a new routine here to plot preliminary analysis
