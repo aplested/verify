@@ -25,6 +25,15 @@ def file_write (file,data):
 	f.close()
 	return
 
+def addFilenamePrefix (path, prefix=""):
+    #take a path and add a prefix to the filename (for example, datestamp)
+    
+    directory, filename = os.path.split(path)
+    filename = prefix + filename
+    
+    return os.path.join(directory,filename)
+
+
 def lines_into_traces (lines):
 	"""Convert a list of ASCII text lines into traces (a list of lists of floats)""" 
 	#print lines
