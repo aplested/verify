@@ -1,0 +1,8 @@
+*.pyc
+*.xcodeproj
+nbproject
+__pycache__
+.DS_Store
+.ipynb_checkpoints
+*.bat
+verified.txt
