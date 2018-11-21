@@ -3,6 +3,7 @@ from os import system
 import sys
 import platform
 import file_tools
+from trace_tools import decimate_traces
 from noise import *
 from datetime import datetime
 
@@ -97,9 +98,9 @@ class verifyGUI:
         self.de.insert(END, '1')
         
         Label(frame, text="Unitary current amplitude (pA)", bg="#dcdcdc").grid(row=3, column=2, columnspan=2, pady=5, sticky=E)
-        self.e5 = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
-        self.e5.grid(row=3, column=4, sticky=W, pady=5)
-        self.e5.insert(END, '1')
+        self.ua = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
+        self.ua.grid(row=3, column=4, sticky=W, pady=5)
+        self.ua.insert(END, '1')
         
         Label(frame, text="Output filename", bg="#dcdcdc").grid(row=4, column=2, columnspan=2, pady=5)
         
@@ -229,12 +230,26 @@ class verifyGUI:
         return input_traces, data_file_name
 
     def getResult(self):
-        self.unitary = float(self.e5.get())
-        self.input_traces, message = clean_bad_baselines(self.input_traces)
+        self.unitary = float(self.ua.get())
+        print ("Taking unitary current from GUI:  {} pA".format(self.unitary))
+
+        self.decimation = int(self.de.get())
+        print ("Decimating by {} according to GUI".format(self.decimation))
+
+        #decimate but preserve the original files in case user wants to run again with different decimation etc
+        if self.decimation > 1:
+            self.dec_traces = decimate_traces(self.input_traces, self.decimation)
+        else:
+            self.dec_traces = self.input_traces
+        
+        self.baseline_range = [int(x) for x in self.br.get().split(",")]
+        print ("Taking baseline range from GUI. Points from {} to {}".format(self.baseline_range[0], self.baseline_range[1]))
+        
+        self.input_traces, message = clean_bad_baselines(self.dec_traces, self.baseline_range)
         print ("MESSAGE FROM CLEAN BAD: "+message)
-        self.input_traces, self.difference_traces, messages, self.output_header = construct_diffs(self.input_traces)
+        self.input_traces, self.difference_traces, messages, self.output_header = construct_diffs(self.dec_traces, self.unitary, self.baseline_range)
         print ("MESSAGES FROM CONSTRUCT_DIFFS: "+messages)
-        self.verified_output = final_prep(self.input_traces, self.difference_traces)
+        self.verified_output = final_prep(self.dec_traces, self.difference_traces, self.baseline_range)
 
 
         

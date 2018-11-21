@@ -19,14 +19,14 @@ from file_tools import file_read, file_write, traces_into_lines, lines_into_trac
 
 def square (x): return x*x
 
-def mean_inverse_baseline_sub(traces):
+def mean_inverse_baseline_sub(traces, b_start=0, b_end=99):
 	"""get mean current waveform, invert for positive and subtract baseline"""
 
 	mean = traces_average(traces)
 
 	inverse_mean = trace_scale(mean,-1.0)
 
-	mean_bs_sub = baseline_subtract(inverse_mean)
+	mean_bs_sub = baseline_subtract(inverse_mean, b_start, b_end)
 	
 	return mean_bs_sub
 
@@ -36,13 +36,15 @@ def parameters ():
 
     #print 'This platform calls itself', platform.system()
 
+#would be better to have a class so that could be initialized with parameters.
 
-
-def clean_bad_baselines(input_traces):
+def clean_bad_baselines(input_traces, baseline_range=[0,99]):
     # bad traces are removed from input
     ##get baseline variances and their statistics
 
-    mean_sigma2_bs, rmsd_sigma2_bs, bs_variances = baselines_quality (input_traces)
+    b_start = baseline_range[0]
+    b_end = baseline_range[1]
+    mean_sigma2_bs, rmsd_sigma2_bs, bs_variances = baselines_quality (input_traces, b_start, b_end)
 
     print 'Mean baseline variance = ', mean_sigma2_bs
     print 'RMSD of baseline variance =', rmsd_sigma2_bs
@@ -66,11 +68,14 @@ def clean_bad_baselines(input_traces):
     return input_traces, message
 
 
-def construct_diffs(input_traces):
+def construct_diffs(input_traces, UNITARY_CURRENT=.5, baseline_range=[0,99]):
     ## Construct difference traces according to transform of Sigg et al 1994
 
-    UNITARY_CURRENT = .5          #Previously estimated, should be passed from GUI
+              #Previously estimated, should be passed from GUI
     messages =""
+    b_start = baseline_range[0]
+    b_end = baseline_range[1]
+    
     difference_traces = []
     for x in range(len(input_traces)-1):
         diff = []
@@ -81,10 +86,10 @@ def construct_diffs(input_traces):
     print 'Constructed ', len(difference_traces), ' difference traces'
 
     ## calculate mean current, invert and subtract baseline
-    mean_I_inverted_bs_sub = mean_inverse_baseline_sub(input_traces)
+    mean_I_inverted_bs_sub = mean_inverse_baseline_sub(input_traces, b_start, b_end)
 
     ##Recalculate mean baseline variance for remaining traces
-    mean_sigma2_bs, rmsd_sigma2_bs, bs_variances = baselines_quality (input_traces)
+    mean_sigma2_bs, rmsd_sigma2_bs, bs_variances = baselines_quality (input_traces, b_start, b_end)
 
     ##calculate theoretical noise limit for each point in the trace
     limits = []
@@ -153,10 +158,11 @@ def construct_diffs(input_traces):
     return input_traces, difference_traces, messages, header_line
 
 
-def final_prep(input_traces, difference_traces):
-
+def final_prep(input_traces, difference_traces, baseline_range):
+    b_start = baseline_range[0]
+    b_end = baseline_range[1]
     ## calculate mean current, invert and subtract baseline
-    final_mean_I_inverted_bs_sub = mean_inverse_baseline_sub(input_traces)
+    final_mean_I_inverted_bs_sub = mean_inverse_baseline_sub(input_traces, b_start, b_end)
 
     final_ensemble_variance = []
 
