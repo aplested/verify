@@ -38,11 +38,13 @@ class verifyGUI:
         
         p = platform.system()
         if p == 'Darwin':
-            print ("Trying to force window to the front on Mac OSX")
+            
             try:
                 system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
+                print ("Trying to force Python window to the front on macOS")
             except:
                 system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python2.7" to true' ''')
+                print ("Trying to force Python 2.7 window to the front on macOS")
         
         self.master = master
         frame = Frame(master)
@@ -51,7 +53,7 @@ class verifyGUI:
         frame.place(relx=0.5, rely=0.5, anchor=CENTER)
         master.title('Verify v. 0.2')    #   Main frame title
         master.config(background="#dcdcdc")
-        master.geometry('800x480')
+        master.geometry('850x480')
         menubar = Menu(master)
         
         """statmenu = Menu(menubar,tearoff=0)
@@ -83,7 +85,7 @@ class verifyGUI:
         
         self.input_filename_label = StringVar()
         self.input_filename_label.set("No data loaded yet")
-        self.l1 = Label(frame, textvariable=self.input_filename_label, bg="#dcdcdc")
+        self.l1 = Label(frame, textvariable=self.input_filename_label, width=40, bg="#dcdcdc")
         self.l1.grid(row=0, column=2, columnspan=4, pady=5)
         
         
@@ -152,6 +154,7 @@ class verifyGUI:
 
     def callback_fname(self):
     ### there is no need to do anything until the analysis starts
+    #this is just for debugging
         print self.v.get()
     
     def callback5(self):
