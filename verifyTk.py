@@ -21,18 +21,17 @@ __date__ ="$07-Nov-2018$"
 
 
 class verifyGUI:
-    introduction = """
-        Verify fluctuations from ion channel noise in difference records
-        ----------------------------------------------------------------
-        according to expectation of not exceeding 7 SD
-        from Heinemann and Conti 'Methods in Enzymology' 207
-        Takes input from tab-delimited Excel file 'file.txt' with columns being current traces
-        Mean and variance are computed for the set to use in noise limit test
-        Baseline noise is determined for each difference trace from the first hundred points (2 ms at 50 kHz)
-        Traces with extremely noisy baselines are removed
-        Traces that exceed the 7 SD limit are removed and the failing points are explicitly listed to the terminal
-        Output is tab delimited text file with columns consisting of mean, variance and verified difference traces, default to 'verified.txt'
-        """
+    introduction ="""
+    ---- Verify fluctuations from ion channel noise in difference records ----\n
+    according to expectation of not exceeding 7 SD\
+    (from Heinemann and Conti 'Methods in Enzymology' 207).
+    Takes input from tab-delimited Excel file 'file.txt' with columns being current traces.
+    * Mean and variance are computed for the set to use in noise limit test.
+    * Baseline noise is determined for each difference trace from the first hundred points (2 ms at 50 kHz)
+    * Traces with extremely noisy baselines are removed.
+    * Traces that exceed the 7 SD limit are removed and the failing points are explicitly listed to the terminal.
+    Output is tab delimited text file with columns consisting of mean, variance and verified difference traces, default to 'verified.txt'
+    """
 
     def __init__(self, master):
         
@@ -47,15 +46,13 @@ class verifyGUI:
         self.master = master
         frame = Frame(master)
         frame.config(background="#dcdcdc")
-        frame.pack()
-        master.title('Verify v. 0.1')    #   Main frame title
+        frame.config(borderwidth=5, relief=GROOVE)
+        frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+        master.title('Verify v. 0.2')    #   Main frame title
         master.config(background="#dcdcdc")
-        master.geometry('960x480')
+        master.geometry('800x480')
         menubar = Menu(master)
         
-        
-        
-    
         """statmenu = Menu(menubar,tearoff=0)
         statmenu.add_command(label="Fieller", command=self.on_fieller)
         
@@ -70,44 +67,52 @@ class verifyGUI:
         menubar.add_cascade(label="Statistical Tests", menu=statmenu)
         master.config(menu=menubar)
       """
-        b3 = Button(frame, text="Load traces", width=30, command=self.callback3, highlightbackground="#dcdcdc")
-        b3.grid(row=5, column=0, columnspan=2, padx=10, pady=8, sticky=W)
+        b3 = Button(frame, text="Load traces", width=20, command=self.callback3, highlightbackground="#dcdcdc")
+        b3.grid(row=0, column=0, columnspan=2, padx=10, pady=8, sticky=W)
+        
+        self.b4 = Button(frame, text="Verify traces variance", width=20, state=DISABLED, command=self.callback2, highlightbackground="#dcdcdc")
+        self.b4.grid(row=1, padx=10, pady=8, column=0, columnspan=2)
+
+        self.b5 = Button(frame, text="Plot Variance vs. current", width=20, state=DISABLED, command=self.callback5, highlightbackground="#dcdcdc")
+        self.b5.grid(row=2, padx=10, pady=8, column=0, columnspan=2)
         
         #need to remove Pack to use separator
-        #w = Separator(orient=VERTICAL)
-        #w.grid(column=2, rowspan=20, pady=5, sticky=NS)
+        s1 = Separator(frame, orient=VERTICAL)
+        s1.grid(column=2, row=0, rowspan=40, pady=10, sticky=N+W+S)
         
         self.input_filename_label = StringVar()
         self.input_filename_label.set("No data loaded yet")
         self.l1 = Label(frame, textvariable=self.input_filename_label, bg="#dcdcdc")
-        self.l1.grid(row=1, column=2, columnspan=4, pady=5, sticky=E)
+        self.l1.grid(row=0, column=2, columnspan=4, pady=5)
         
         
-        Label(frame, text="Baseline range (pts):", bg="#dcdcdc").grid(row=5, column=2, pady=5, sticky=E)
+        Label(frame, text="Baseline range (pts)", bg="#dcdcdc").grid(row=1, column=2, columnspan=2, pady=5, sticky=E)
         self.br = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
-        self.br.grid(row=5, column=3, sticky=W, pady=5)
-        self.br.insert(END, '0,50')
+        self.br.grid(row=1, column=4, sticky=W, pady=5)
+        self.br.insert(END, '0, 50')
         
-        Label(frame, text="Decimation:", bg="#dcdcdc").grid(row=6, column=2, pady=5, sticky=E)
+        Label(frame, text="Decimation", bg="#dcdcdc").grid(row=2, column=2, columnspan=2, pady=5, sticky=E)
         self.de = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
-        self.de.grid(row=6, column=3, sticky=W, pady=5)
+        self.de.grid(row=2, column=4, sticky=W, pady=5)
         self.de.insert(END, '1')
         
-        Label(frame, text="Unitary current amplitude (pA):", bg="#dcdcdc").grid(row=7, column=2, pady=5, sticky=E)
+        Label(frame, text="Unitary current amplitude (pA)", bg="#dcdcdc").grid(row=3, column=2, columnspan=2, pady=5, sticky=E)
         self.e5 = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
-        self.e5.grid(row=7, column=3, sticky=W, pady=5)
+        self.e5.grid(row=3, column=4, sticky=W, pady=5)
         self.e5.insert(END, '1')
         
-        Label(frame, text="Output filename:", bg="#dcdcdc").grid(row=21, column=2, columnspan=2, pady=5, sticky=W)
+        Label(frame, text="Output filename", bg="#dcdcdc").grid(row=4, column=2, columnspan=2, pady=5)
         
         style = Style()
-        style.configure("TRadiobutton", padding=6, foreground="black", font=("Courier", 10), space=50)
+        style.theme_use('clam')
+        style.configure("w.TRadiobutton", padding=2, background="#dcdcdc", foreground="black", width=15)
+        style.configure("TRadiobutton", padding=2, background="#dcdcdc", foreground="black", width=8)
         
         MODES = [
-                 ("'verified.txt'", 3),
+                 ("verified.txt", 3),
                  ("Save as...", 2),
-                 ("'v_[input]'", 1),
-                 ("'{date:time}_v_[input]'", 0)
+                 ("v_[infile]", 1),
+                 ("[date:time]_v_[infile]", 0)
                  ]
 
         self.v = IntVar()
@@ -116,30 +121,29 @@ class verifyGUI:
         #note this is the ttk radiobutton, the tk one doesn't select at first
         for text, mode in MODES:
             b = Radiobutton(frame, text=text, command=self.callback_fname, variable=self.v, value=mode, state=NORMAL)
-            b.grid(row=22, column=mode+2)
+            b.grid(row=5, padx=10, column=mode+2, sticky=E)
     
-        
-        #frame.update_idletasks()
-
+        #the last button in the loop (0) is the wide one, so gets the wide style.
+        b.configure(style='w.TRadiobutton')
         #default unitary current is 1 pA
         
         
-        self.b4 = Button(frame, text="Verify traces variance", width=30, state=DISABLED, command=self.callback2, highlightbackground="#dcdcdc")
-        self.b4.grid(row=6, padx=10, pady=8, column=0, columnspan=2)
-        self.b5 = Button(frame, text="Plot Variance vs current", width=30, state=DISABLED, command=self.callback5, highlightbackground="#dcdcdc")
-        self.b5.grid(row=7, padx=10, pady=8, column=0, columnspan=2)
+
+        s2 = Separator(frame)
+        s2.grid(row=25, columnspan=6, sticky=S+E+W)
+        
+        message = Message(frame, text=self.introduction, width=800, font=("Courier", 12), bg="#dcdcdc")
+        message.grid(row=26, rowspan=8, columnspan=6, sticky=EW)
+        
+        s3 = Separator(frame)
+        s3.grid(row=35, columnspan=6, sticky=E+W)
+        
+        version_text = "\nhttps://github.com/aplested/verify\nPython version:\t" + sys.version.replace("\n", "\t")
+        version = Message(frame, width=800, text=version_text, justify=LEFT, background="#dcdcdc", font=("Courier", 12))
+        version.grid(row=36, columnspan=5, sticky=EW)
 
         self.b6 = Button(frame, text="Quit", command=master.quit, width=10, highlightbackground="#dcdcdc")
-        self.b6.grid(row=24, padx=10,  pady=8, column=0, sticky=W)
-
-        version = Message(master, width=700, text="https://github.com/aplested/verify\tPython version: " + sys.version, background="#99eedc", font=("Helvetica", 10))
-        version.pack(side=BOTTOM, fill=X)
-
-        message = Message(master, text=self.introduction, justify=LEFT, width=700, font=("Helvetica", 12), bg="#dceedc", relief=RAISED)
-        message.pack(side=BOTTOM, fill=X)
-        
-
-    
+        self.b6.grid(row=36, padx=10,  pady=8, column=5, sticky=W)
     
 
     def on_help():
