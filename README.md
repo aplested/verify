@@ -5,9 +5,11 @@ Check the variance of electrophysiological recordings for noise analysis. Tkinte
 
 ![ScreenShot](/screenshots/verify.png) 
 
-Tested and running: 
-MacOS 10.13, Python 2.7.15. In terminal, navigate to directory and type python verify.py
-Windows 10 Pro, Python 2.7.15 (64-bit .msi). Double-click verify.py to launch
+Tested and running:
+
+  MacOS 10.13, Python 2.7.15. In terminal, navigate to directory and type python verify.py
+
+  Windows 10 Pro, Python 2.7.15 (64-bit .msi). Double-click verify.py to launch
 
 Notes: 
 
