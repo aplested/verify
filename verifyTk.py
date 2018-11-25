@@ -149,7 +149,7 @@ class verifyGUI:
         s3 = Separator(frame)
         s3.grid(row=35, columnspan=6, sticky=E+W)
         
-        version_text = "\nhttps://github.com/aplested/verify\nPython version:\t" + sys.version.replace("\n", "\t")
+        version_text = "https://github.com/aplested/verify\nPython version:\t" + sys.version.replace("\n", "\t")
         version = Message(frame, width=800, text=version_text, justify=LEFT, background="#dcdcdc", font=("Courier", 12))
         version.grid(row=36, columnspan=5, sticky=EW)
 

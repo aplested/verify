@@ -32,13 +32,14 @@ class Plot:
     def real2Pix(self, x, y):
         'Converts real world coordinates into graph pixel coordinates'
         self.xScaleDbl = float(self.xMaxPix - self.xMinPix) / (self.xAxis[-1] - self.xAxis[0])
-        xpix = int(self.xMinPix + self.xScaleDbl * x)
-        
+        xpix = int(self.xMinPix + self.xScaleDbl * (x - self.xAxis[0]))
+
         #yScaleDbl should be a negative number because pixels increase as real signal goes negative
         #yAxis counts from large to small
         #datum of y is in the middle of axis
         self.yScaleDbl = float(self.yMaxPix - self.yMinPix) / (self.yAxis[-1] - self.yAxis[0])
-        ypix = int(float(self.yMaxPix - self.yMinPix) / 2 + self.yMinPix + self.yScaleDbl * y)
+        ypix = int(self.yMaxPix + self.yScaleDbl * (y - self.yAxis[-1] ))
+
         #print (self.yMaxPix, self.yMinPix, self.yScaleDbl, xpix, ypix)
         return xpix, ypix
     
@@ -53,10 +54,10 @@ class Plot:
         self.yAxisTitle = "Variance"
         
         #data limits
-        self.ymin = min(yData)
-        self.ymax = max(yData)
-        self.xmax = max(xData)
-        self.xmin = min(xData)
+        self.ymin = min(self.yData)
+        self.ymax = max(self.yData)
+        self.xmax = max(self.xData)
+        self.xmin = min(self.xData)
         
         self.createAxes()
     
@@ -107,14 +108,17 @@ class Plot:
         yMaxPix = self.yMaxPix
         yMinPix = self.yMinPix
         
-        print (self.xmin, self.xmax)
-        self.xAxis = range(int(self.xmin), int(self.xmax), int(float(self.xmax - self.xmin) / 5))
-        
-        yAxisMin = int((self.ymax - self.ymin) * -1.25)
-        yAxisMax = int((self.ymax - self.ymin) * 1.25)
+        # +1 to cope with rounding errof for the last interval
+        self.xAxis = range(int(self.xmin), int(self.xmax)+1, int(float(self.xmax - self.xmin) / 5))
+        #self.xAxis.append(int(self.xmax))
+        #print (self.xAxis, self.xmin, self.xmax)
+        yAxisMin = int(1.5 * self.ymin - 0.5 * self.ymax)
+        yAxisMax = int(0.5 * self.ymin + 1.5 * self.ymax)
         #yAxis counts from max to min in negative steps
-        self.yAxis = range(yAxisMax, yAxisMin, -int(float(yAxisMax - yAxisMin) / 5))
-        print (self.yAxis, self.ymin, self.ymax)
+        #-1 to cope with rounding error for the last interval
+        self.yAxis = range(yAxisMax, yAxisMin-1, -int(float(yAxisMax - yAxisMin) / 5))
+        #self.yAxis.append(yAxisMin)
+        #print (self.yAxis, self.ymin, self.ymax)
 
         # x Axis
         self.c.create_line(xMinPix, yMaxPix, xMaxPix, yMaxPix, width=2)    # axis at bottom
