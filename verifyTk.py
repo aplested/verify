@@ -4,6 +4,7 @@ import sys
 import platform
 import file_tools
 from trace_tools import decimate_traces
+from Plot import *
 from noise import *
 from datetime import datetime
 
@@ -99,11 +100,13 @@ class verifyGUI:
         self.de.grid(row=2, column=4, sticky=W, pady=5)
         self.de.insert(END, '1')
         
+        
         Label(frame, text="Unitary current amplitude (pA)", bg="#dcdcdc").grid(row=3, column=2, columnspan=2, pady=5, sticky=E)
         self.ua = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
         self.ua.grid(row=3, column=4, sticky=W, pady=5)
         self.ua.insert(END, '1')
-        
+        #default unitary current is 1 pA
+         
         Label(frame, text="Output filename", bg="#dcdcdc").grid(row=4, column=2, columnspan=2, pady=5)
         
         style = Style()
@@ -128,10 +131,7 @@ class verifyGUI:
     
         #the last button in the loop (0) is the wide one, so gets the wide style.
         b.configure(style='w.TRadiobutton')
-        #default unitary current is 1 pA
         
-        
-
         s2 = Separator(frame)
         s2.grid(row=25, columnspan=6, sticky=S+E+W)
         
@@ -160,9 +160,11 @@ class verifyGUI:
     def callback5(self):
         'Called by PLOT variance current button.'
         #make a new routine here to plot preliminary analysis
-        pass
-        #PlotRandomDist(self.output, self.paired,0,1, self.meanToPlot)
-
+        pcv = Plot()
+        pcv.prep2DPlot(self.meanI, self.ensVariance)
+        pcv.addTitle("Current Variance Plot")
+        pcv.drawTrace()
+        
     def callback3(self):
         'Called by TAKE DATA FROM excel button'
         self.input_traces, self.dfile = self.read_Data('excel')
@@ -170,6 +172,10 @@ class verifyGUI:
         if self.dfile != None:
             self.input_filename_label.set('Data loaded from ' + self.dfile)
             self.b4.config(state=NORMAL)    #turn on VERIFY button
+            p = Plot()
+            p.prepTracePlot(self.input_traces[0])
+            p.addTitle("First trace in {}".format(self.dfile))
+            p.drawTrace()
         else:
             self.input_filename_label.set('No data loaded')
 
@@ -178,6 +184,8 @@ class verifyGUI:
         'Called by VERIFY button'
         #send traces to be checked
         print ("Verify")
+        
+        #results are stored in self.verified_output
         self.getResult()
         
         #default
@@ -191,7 +199,7 @@ class verifyGUI:
             out_filename = file_tools.addFilenamePrefix(self.dfile, prefix="v_")
         elif opt == 0:
             out_filename = file_tools.addFilenamePrefix(self.dfile, prefix=datetime.now().strftime("%y%m%d-%H%M%S") + "_v_")
-        
+        self.b5.config(state=NORMAL) 
         write_output (self.verified_output, self.output_header, out_filename)
     
     
@@ -253,6 +261,10 @@ class verifyGUI:
         self.input_traces, self.difference_traces, messages, self.output_header = construct_diffs(self.dec_traces, self.unitary, self.baseline_range)
         print ("MESSAGES FROM CONSTRUCT_DIFFS: "+messages)
         self.verified_output = final_prep(self.dec_traces, self.difference_traces, self.baseline_range)
+
+        #the following are used for plotting
+        self.ensVariance = self.verified_output[1]
+        self.meanI = self.verified_output[0]
 
 
         

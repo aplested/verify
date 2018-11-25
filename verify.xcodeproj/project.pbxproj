@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		4935727121A6D25300350B06 /* Plot.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Plot.py; sourceTree = "<group>"; };
+		4935727221A6D27700350B06 /* PlotParam.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = PlotParam.py; sourceTree = "<group>"; };
 		49D7D8CA2193164F001AA46D /* verify.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = verify.py; sourceTree = "<group>"; };
 		49D7D8CC219318AD001AA46D /* verifyTk.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = verifyTk.py; sourceTree = "<group>"; };
 		49D7D8CD2193192E001AA46D /* file_tools.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = file_tools.py; sourceTree = "<group>"; };
@@ -25,6 +27,8 @@
 				49D7D8CD2193192E001AA46D /* file_tools.py */,
 				49D7D8CF2193192E001AA46D /* filter.py */,
 				49D7D8CE2193192E001AA46D /* trace_tools.py */,
+				4935727121A6D25300350B06 /* Plot.py */,
+				4935727221A6D27700350B06 /* PlotParam.py */,
 			);
 			sourceTree = "<group>";
 		};
