@@ -15,12 +15,16 @@ class Plot:
     'Displays a plot in a Tkinter frame.'
     def __init__(self, host):
         self.createFrame(host)
-        b1 = Button(host, text="Replot", command=self.callback1, state=DISABLED)
-        b1.grid(row=1, column=0)
-        b2 = Button(host, text="Save Pic", command=self.callback2, state=DISABLED)
-        b2.grid(row=1, column=1)
         
-        #host.mainloop()
+        #make the buttons for each plot but don't show them yet
+        self.b1 = Button(host, text="Replot", command=self.callback1, state=DISABLED)
+        self.b2 = Button(host, text="Save Pic", command=self.callback2, state=DISABLED)
+        self.b1.grid(row=1, column=0)
+        self.b2.grid(row=1, column=1)
+    
+        #self.b1.grid_remove()
+        #self.b2.grid_remove()
+    
     
     def addTitle(self, title):
         self.c.create_text(220, 15, text=title)
@@ -133,6 +137,8 @@ class Plot:
         self.c.create_text(xMinPix - 50, yMaxPix - 100, text=self.yAxisTitle, font=("Helvectica", "12"), angle=90)
         
     def draw2D(self):
+
+        #self.replaceButtons()   #makes sense to show these buttons now
         r = 2
         for i in range(len(self.xData)):
             #include abs in case current is negative-going
@@ -146,9 +152,11 @@ class Plot:
                                outline='DarkSlateBlue',
                                fill='SteelBlue'
                                )
+    
 
     def drawTrace(self):
         #using Fred Sigworth's speed trick of only drawing one point per horizontal pixel
+        #self.replaceButtons()
         npt = 300
         r = 2
         for i in range(0, self.xmax, int(float(self.xmax) / npt)):
@@ -159,8 +167,8 @@ class Plot:
                                   px + r,
                                   py + r,
                                   width=1,
-                                  outline='DarkSlateBlue',
-                                  fill='SteelBlue'
+                                  outline='Green',
+                                  fill='Green'
                                   )
     
         """xArrDbl = mean
@@ -170,7 +178,9 @@ class Plot:
         c.create_line(xArr+5, yMinPix+10, xArr-5, yMinPix+10, width=2, fill="blue")
         """
 
-
+    def replaceButtons(self):
+        self.b1.grid()
+        self.b2.grid()
 
     def callback1(self):
         'Called by REPLOT button.'
