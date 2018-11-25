@@ -37,8 +37,8 @@ class verifyGUI:
 
     def __init__(self, master):
         
-        p = platform.system()
-        if p == 'Darwin':
+        plat = platform.system()
+        if plat == 'Darwin':
             
             try:
                 system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
@@ -54,7 +54,7 @@ class verifyGUI:
         frame.place(relx=0.5, rely=0.5, anchor=CENTER)
         master.title('Verify v. 0.2')    #   Main frame title
         master.config(background="#dcdcdc")
-        master.geometry('850x480')
+        master.geometry('820x750')
         menubar = Menu(master)
         
         """statmenu = Menu(menubar,tearoff=0)
@@ -132,6 +132,14 @@ class verifyGUI:
         #the last button in the loop (0) is the wide one, so gets the wide style.
         b.configure(style='w.TRadiobutton')
         
+        self.traceHost = Frame(frame)
+        self.traceHost.grid(row=15, column=0, columnspan=3)
+        self.p = Plot(self.traceHost)
+        
+        self.Host2D = Frame(frame)
+        self.Host2D.grid(row=15, column=3, columnspan=3)
+        self.pcv = Plot(self.Host2D)
+        
         s2 = Separator(frame)
         s2.grid(row=25, columnspan=6, sticky=S+E+W)
         
@@ -160,10 +168,8 @@ class verifyGUI:
     def callback5(self):
         'Called by PLOT variance current button.'
         #make a new routine here to plot preliminary analysis
-        pcv = Plot()
-        pcv.prep2DPlot(self.meanI, self.ensVariance)
-        pcv.addTitle("Current Variance Plot")
-        pcv.drawTrace()
+        pass
+    
         
     def callback3(self):
         'Called by TAKE DATA FROM excel button'
@@ -172,10 +178,10 @@ class verifyGUI:
         if self.dfile != None:
             self.input_filename_label.set('Data loaded from ' + self.dfile)
             self.b4.config(state=NORMAL)    #turn on VERIFY button
-            p = Plot()
-            p.prepTracePlot(self.input_traces[0])
-            p.addTitle("First trace in {}".format(self.dfile))
-            p.drawTrace()
+            #p = Plot(self.traceHost)   done above now
+            self.p.prepTracePlot(self.input_traces[0])
+            self.p.addTitle("First trace in {}".format(self.dfile))
+            self.p.drawTrace()
         else:
             self.input_filename_label.set('No data loaded')
 
@@ -199,7 +205,12 @@ class verifyGUI:
             out_filename = file_tools.addFilenamePrefix(self.dfile, prefix="v_")
         elif opt == 0:
             out_filename = file_tools.addFilenamePrefix(self.dfile, prefix=datetime.now().strftime("%y%m%d-%H%M%S") + "_v_")
-        self.b5.config(state=NORMAL) 
+        #self.b5.config(state=NORMAL)
+        #plot preview of current variance automatically
+        self.pcv.prep2DPlot(self.meanI, self.ensVariance)
+        self.pcv.addTitle("Preview of Current Variance Plot")
+        self.pcv.draw2D()
+        
         write_output (self.verified_output, self.output_header, out_filename)
     
     

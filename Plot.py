@@ -12,12 +12,18 @@ __author__="Andrew"
 __date__ ="$22-Nov-2018 12:52:01$"
 
 class Plot:
-    'Displays a plot in a Window.'
-    def __init__(self):
-        self.createFrame()
+    'Displays a plot in a Tkinter frame.'
+    def __init__(self, host):
+        self.createFrame(host)
+        b1 = Button(host, text="Replot", command=self.callback1, state=DISABLED)
+        b1.grid(row=1, column=0)
+        b2 = Button(host, text="Save Pic", command=self.callback2, state=DISABLED)
+        b2.grid(row=1, column=1)
+        
+        #host.mainloop()
     
-    def addTitle(self, text):
-        self.root.title(text)
+    def addTitle(self, title):
+        self.c.create_text(220, 15, text=title)
     
     def real2Pix(self, x, y):
         'Converts real world coordinates into graph pixel coordinates'
@@ -33,13 +39,13 @@ class Plot:
         return xpix, ypix
     
     def prep2DPlot(self, xData, yData):
-        self.root.title("2D Plot")
-        self.xData = xData
+        'Prepare for 2D plotting, taking account of data'
+        #self.root.title("2D Plot")
+        self.xData = [abs(x) for x in xData]
         self.yData = yData
         
-        self.xAxisTitle = "Current"
-
         #this should be plot specific
+        self.xAxisTitle = "Current"
         self.yAxisTitle = "Variance"
         
         #data limits
@@ -51,7 +57,8 @@ class Plot:
         self.createAxes()
     
     def prepTracePlot(self, trace):
-        self.root.title("Trace")
+        'Prepare to plot a trace, taking account of data'
+        #self.root.title("Trace")
         self.trace = trace
         plotType = 0
         
@@ -70,31 +77,35 @@ class Plot:
     
         self.createAxes()
     
-    def createFrame(self):
-        'Creates frame for plot'
+    def createFrame(self, host):
+        'Create frame for plot'
 
-        self.root = Tk()
-        self.root.resizable(width='FALSE', height='FALSE')    # should make window not resizable
-        cwidth = 600
-        cheight = 350
-        self.c = Canvas(self.root, width=cwidth, height=cheight, bg= 'white')
+        #self.root = Tk()
+        #host.resizable(width='FALSE', height='FALSE')    # should make window not resizable
+        cwidth = 400
+        cheight = 300
+        self.c = Canvas(host, width=cwidth, height=cheight, bg= 'white')
         self.c.grid(row=0, column=0, columnspan=2)
 
         #these are the corner pixels of the graph (L to R, Top to Bottom)
         self.xMinPix = int(cwidth * 15 / 100)
         self.xMaxPix = int(cwidth * 95 / 100)
-        self.yMinPix = int(cheight * 5 / 100)
+        self.yMinPix = int(cheight * 10 / 100)
         self.yMaxPix = int(cheight * 85 / 100)
     
     def createAxes(self):
+        'Draw the axes'
         #to do this properly, we need to know the data limits
+        #not foolproof yet!!!
         #to make expressions below shorter
         xMinPix = self.xMinPix
         xMaxPix = self.xMaxPix
         yMaxPix = self.yMaxPix
         yMinPix = self.yMinPix
         
-        self.xAxis = range(int(self.xmin), int(self.xmax), int(self.xmax / 5))
+        print (self.xmin, self.xmax)
+        self.xAxis = range(int(self.xmin), int(self.xmax), int(float(self.xmax - self.xmin) / 5))
+        
         yAxisMin = int((self.ymax - self.ymin) * -1.25)
         yAxisMax = int((self.ymax - self.ymin) * 1.25)
         #yAxis counts from max to min in negative steps
@@ -119,12 +130,13 @@ class Plot:
             self.c.create_line(px, py, px-5, py, width=2)
             self.c.create_text(px - 25, py, text='%i'% tick)
         
-        self.c.create_text(xMinPix - 50, yMaxPix - 150, text=self.yAxisTitle, font=("Helvectica", "12"), angle=90)
+        self.c.create_text(xMinPix - 50, yMaxPix - 100, text=self.yAxisTitle, font=("Helvectica", "12"), angle=90)
         
     def draw2D(self):
         r = 2
         for i in range(len(self.xData)):
-            px, py = self.real2Pix(self.xData[i], self.yData[i])
+            #include abs in case current is negative-going
+            px, py = self.real2Pix(abs(self.xData[i]), self.yData[i])
             self.c.create_oval(
                                px - r,
                                py - r,
@@ -150,10 +162,7 @@ class Plot:
                                   outline='DarkSlateBlue',
                                   fill='SteelBlue'
                                   )
-            # put the y value above each bar
-            #c.create_text(x0+2, y1, anchor=tk.SW, text=str(self.freq[i]))
-        print (px, py)
-        # draw small triangle arrow at particular x
+    
         """xArrDbl = mean
         xArr = xMinPix + int((float(xArrDbl)-xMinDbl) * xScaleDbl)
         c.create_line(xArr, yMinPix, xArr-5, yMinPix+10, width=2, fill="blue")
@@ -161,12 +170,7 @@ class Plot:
         c.create_line(xArr+5, yMinPix+10, xArr-5, yMinPix+10, width=2, fill="blue")
         """
 
-        b1 = Button(self.root, text="REPLOT", command=self.callback1, state=DISABLED)
-        b1.grid(row=1, column=0)
-        b2 = Button(self.root, text="Save ASCII", command=self.callback2, state=DISABLED)
-        b2.grid(row=1, column=1)
-        
-        self.root.mainloop()
+
 
     def callback1(self):
         'Called by REPLOT button.'
