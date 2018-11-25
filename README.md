@@ -3,7 +3,7 @@
 Version 0.2
 Check the variance of electrophysiological recordings for noise analysis. Tkinter GUI version.
 
-![ScreenShot](/screenshots/verify.png) 
+![ScreenShot](/screenshots/verify_GUI2.png) 
 
 Tested and running:
 
