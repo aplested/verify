@@ -178,7 +178,6 @@ class verifyGUI:
         if self.dfile != None:
             self.input_filename_label.set('Data loaded from ' + self.dfile)
             self.b4.config(state=NORMAL)    #turn on VERIFY button
-            #p = Plot(self.traceHost)   done above now
             self.p.prepTracePlot(self.input_traces[0])
             self.p.addTitle("First trace in {}".format(self.dfile))
             self.p.drawTrace()
