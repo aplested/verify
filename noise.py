@@ -11,7 +11,7 @@
 ## Traces that exceed the limit are popped from the list and the failing points are explicitly listed to the terminal
 ## Output is tab delimited columns of verified traces 'verified.txt'
 
-
+import sys
 from math import *
 import platform
 from trace_tools import mean, variance, rmsd, traces_scale, trace_scale, traces_average, baselines_quality, baseline_subtract
@@ -171,8 +171,11 @@ def final_prep(input_traces, difference_traces, baseline_range):
         for d_trace in difference_traces:
             isochrone.append(d_trace[isochronous_point])
         
-        mean_dZt_squared = mean (map (square, isochrone))
-        
+        if sys.version_info[0] == 3:
+            mean_dZt_squared = mean (list(map (square, isochrone)))
+        else:
+            mean_dZt_squared = mean (map (square, isochrone))
+
         #factor of '2' because of dZt = 1/2 * {y(i+1)-y(i)}; Heinemann and Conti
         final_ensemble_variance.append(2 * mean_dZt_squared)
     
