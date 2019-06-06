@@ -12,7 +12,7 @@ def file_read (file):
 	lines_of_file = block_lines.split('\n') 				#divide into lines at carriage rtns
 	del lines_of_file [0]						# header
 	del lines_of_file [-1]						# last line is blank so remove it
-	print lines_of_file [0]
+	print (lines_of_file [0])
 	return lines_of_file
 	
 def file_write (file,data):

@@ -163,7 +163,7 @@ class verifyGUI:
     def callback_fname(self):
     ### there is no need to do anything until the analysis starts
     #this is just for debugging
-        print self.v.get()
+        print (self.v.get())
     
     def callback5(self):
         'Called by PLOT variance current button.'
