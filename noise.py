@@ -46,9 +46,9 @@ def clean_bad_baselines(input_traces, baseline_range=[0,99]):
     b_end = baseline_range[1]
     mean_sigma2_bs, rmsd_sigma2_bs, bs_variances = baselines_quality (input_traces, b_start, b_end)
 
-    print 'Mean baseline variance = ', mean_sigma2_bs
-    print 'RMSD of baseline variance =', rmsd_sigma2_bs
-    print bs_variances
+    print ('Mean baseline variance = ', mean_sigma2_bs)
+    print ('RMSD of baseline variance =', rmsd_sigma2_bs)
+    print (bs_variances)
 
     ## discard any trace with excessive baseline noise - Sigma2Bs gt Mean + 4 RMSD
     ex_noise_traces_to_pop = []
@@ -83,7 +83,7 @@ def construct_diffs(input_traces, UNITARY_CURRENT=.5, baseline_range=[0,99]):
             diff.append((input_traces[x+1][y]-input_traces[x][y])/2)
         difference_traces.append(diff)
 
-    print 'Constructed ', len(difference_traces), ' difference traces'
+    print ('Constructed ', len(difference_traces), ' difference traces')
 
     ## calculate mean current, invert and subtract baseline
     mean_I_inverted_bs_sub = mean_inverse_baseline_sub(input_traces, b_start, b_end)
@@ -99,7 +99,7 @@ def construct_diffs(input_traces, UNITARY_CURRENT=.5, baseline_range=[0,99]):
             limit =  7 * sqrt(UNITARY_CURRENT * I + mean_sigma2_bs)
             limits.append(limit)
 
-    print 'Verifying variance of difference traces'
+    print ('Verifying variance of difference traces')
 
     excess_points, excess_limits, excess_differences = [],[],[]
 
@@ -130,8 +130,8 @@ def construct_diffs(input_traces, UNITARY_CURRENT=.5, baseline_range=[0,99]):
         if len(excess_points[i]) > 0:
             message = "Trace {} contained {} points greater than the limit and was removed from set\n".format(i, len(excess_points[i]))
             messages += message
-            print message
-            print zip(excess_limits[i],excess_differences[i])
+            print (message)
+            print (zip(excess_limits[i],excess_differences[i]))
             difference_traces_to_pop.append(i)
             if input_traces_to_pop.count(i) == 0: 	#Check if this trace was already discarded last time
                 input_traces_to_pop.append(i)
@@ -195,10 +195,10 @@ def write_output (difference_traces, header_line, filename='verified.txt'):
     output_lines.insert(0, header_line)
     output_file = filename
 
-    print 'Writing {} difference traces to {} with mean and variance in first two columns...'.format(len(difference_traces), output_file)
+    print ('Writing {} difference traces to {} with mean and variance in first two columns...'.format(len(difference_traces), output_file))
 
     file_write (output_file,output_lines)
-    print 'Done'
+    print ('Done')
 
 
 
