@@ -171,7 +171,7 @@ def final_prep(input_traces, difference_traces, baseline_range):
         for d_trace in difference_traces:
             isochrone.append(d_trace[isochronous_point])
         
-        if sys.version_info[0] == 3:
+        if sys.version_info[0] > 2:
             mean_dZt_squared = mean (list(map (square, isochrone)))
         else:
             mean_dZt_squared = mean (map (square, isochrone))
