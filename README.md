@@ -5,9 +5,9 @@ Check the variance of electrophysiological recordings for noise analysis. Tkinte
 
 ![ScreenShot](/screenshots/verify_GUI2.png) 
 
-updated for Python3 and MacOS Sequoia
+branch python3 is updated for Python3 and MacOS Sequoia
 
-old version Tested and running:
+old version (branch main) was tested and running under:
 
   MacOS 10.13, Python 2.7.15. In terminal, navigate to directory and type python verify.py
 
