@@ -1,11 +1,13 @@
 # verify
 
-Version 0.2
+Version 0.3
 Check the variance of electrophysiological recordings for noise analysis. Tkinter GUI version.
 
 ![ScreenShot](/screenshots/verify_GUI2.png) 
 
-Tested and running:
+updated for Python3 and MacOS Sequoia
+
+old version Tested and running:
 
   MacOS 10.13, Python 2.7.15. In terminal, navigate to directory and type python verify.py
 
@@ -14,5 +16,4 @@ Tested and running:
 Notes: 
 
 *if you have Python 3.x, you need to use an alias to launch Python 2.7
-
 *Interface is not fully connected up. 
