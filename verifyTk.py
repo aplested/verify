@@ -8,16 +8,16 @@ from Plot import *
 from noise import *
 from datetime import datetime
 
-if sys.version_info[0] < 3:
+#if sys.version_info[0] < 3:
     # this should not run any more
-    from tkinter import *
-    from tkinter.ttk import Separator, Radiobutton, Style
-    import tkinter.filedialog
+    #from tkinter import *
+    #from tkinter.ttk import Separator, Radiobutton, Style
+    #import tkinter.filedialog
     #print (str(sys.version_info) +" Tkinter")
-else:
-    from tkinter import *
-    from tkinter.ttk import Separator, Radiobutton, Style
-    from tkinter import filedialog as tkFileDialog
+#else:
+from tkinter import *
+from tkinter.ttk import Separator, Radiobutton, Style
+from tkinter import filedialog as tkFileDialog
 
 __author__="Andrew"
 __date__ ="$07-Nov-2018$"
@@ -44,8 +44,9 @@ class verifyGUI:
         if plat == 'Darwin':
             
             try:
-                system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
                 print ("Trying to force Python window to the front on macOS")
+                system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "python" to true' ''')
+                
             except:
                 system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python2.7" to true' ''')
                 print ("Trying to force Python 2.7 window to the front on macOS")
@@ -61,12 +62,7 @@ class verifyGUI:
         menubar = Menu(master)
         
         statmenu = Menu(menubar,tearoff=0)
-        """
-        statmenu.add_command(label="Fieller", command=self.on_fieller)
-        
-        statmenu.rantest = Menu(statmenu)
        
-             """
         statmenu.add_command(label="Help", command=self.on_help, state=DISABLED)
         statmenu.add_command(label="Quit", command=master.quit)
         

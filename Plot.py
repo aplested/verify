@@ -90,11 +90,14 @@ class Plot:
         step_x = max(1, int((self.xmax - self.xmin) / 5))
         self.xAxis = range(int(self.xmin), int(self.xmax) + 1, step_x)
 
-        yAxisMin = int(1.5 * self.ymin - 0.5 * self.ymax)
-        yAxisMax = int(0.5 * self.ymin + 1.5 * self.ymax)
+        #yAxisMin = int(1.2 * self.ymin - 0.2 * self.ymax)
+        #yAxisMax = int(0.2 * self.ymin + 1.2 * self.ymax)
+
+        yAxisMin = int(self.ymin)
+        yAxisMax = int(self.ymax)
 
         step_y = max(1, int((yAxisMax - yAxisMin) / 5))
-        self.yAxis = range(yAxisMax, yAxisMin - 1, -step_y)
+        self.yAxis = range(yAxisMax, yAxisMin, -step_y)
 
         # Draw X-axis
         self.c.create_line(self.xMinPix, self.yMaxPix, self.xMaxPix, self.yMaxPix, width=2)
@@ -123,7 +126,7 @@ class Plot:
             self.c.create_oval(px - r, py - r, px + r, py + r, width=1, outline='DarkSlateBlue', fill='SteelBlue')
 
     def drawTrace(self):
-        """Draw a trace plot."""
+        """Draw a trace."""
         r, npt = 2, 300
         step = max(1, int(self.xmax / npt))
         for i in range(0, self.xmax, step):
@@ -147,6 +150,7 @@ class Plot:
         self.c.delete("all")
         self.createAxes()
         
+        # draw the right kind of data, depending on which plot
         if self.is2DPlot:
             self.draw2D()
             
