@@ -167,7 +167,31 @@ class VerifyMainWindow(QMainWindow):
      
      
 
-    
+    def getResult(self):
+        self.unitary = float(self.ua.get())
+        print(("Taking unitary current from GUI:  {} pA".format(self.unitary)))
+
+        self.decimation = int(self.de.get())
+        print(("Decimating by {} according to GUI".format(self.decimation)))
+
+        #decimate but preserve the original files in case user wants to run again with different decimation etc
+        if self.decimation > 1:
+            self.dec_traces = decimate_traces(self.input_traces, self.decimation)
+        else:
+            self.dec_traces = self.input_traces
+        
+        self.baseline_range = [int(x) for x in self.br.get().split(",")]
+        print(("Taking baseline range from GUI. Points from {} to {}".format(self.baseline_range[0], self.baseline_range[1])))
+        
+        self.input_traces, message = clean_bad_baselines(self.dec_traces, self.baseline_range)
+        print(("Message from CLEAN BAD: "+message))
+        self.input_traces, self.difference_traces, messages, self.output_header = construct_diffs(self.dec_traces, self.unitary, self.baseline_range)
+        print(("Messages from CONSTRUCT_DIFFS: "+messages))
+        self.verified_output = final_prep(self.dec_traces, self.difference_traces, self.baseline_range)
+
+        #the following are used for plotting
+        self.ensVariance = self.verified_output[1]
+        self.meanI = self.verified_output[0]
     
     
     
@@ -223,6 +247,31 @@ class VerifyMainWindow(QMainWindow):
         
         actions.setLayout(actionsGrid)
         
+        ### old TK needs to be fixed
+        self.input_filename_label = StringVar()
+        self.input_filename_label.set("No data loaded yet")
+        self.l1 = Label(frame, textvariable=self.input_filename_label, width=40, bg="#dcdcdc")
+        self.l1.grid(row=0, column=2, columnspan=4, pady=5)
+        
+        
+        Label(frame, text="Baseline range (pts)", bg="#dcdcdc").grid(row=1, column=2, columnspan=2, pady=5, sticky=E)
+        self.br = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
+        self.br.grid(row=1, column=4, sticky=W, pady=5)
+        self.br.insert(END, '0, 50')
+        
+        Label(frame, text="Decimation", bg="#dcdcdc").grid(row=2, column=2, columnspan=2, pady=5, sticky=E)
+        self.de = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
+        self.de.grid(row=2, column=4, sticky=W, pady=5)
+        self.de.insert(END, '1')
+        
+        
+        Label(frame, text="Unitary current amplitude (pA)", bg="#dcdcdc").grid(row=3, column=2, columnspan=2, pady=5, sticky=E)
+        self.ua = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
+        self.ua.grid(row=3, column=4, sticky=W, pady=5)
+        self.ua.insert(END, '1')
+        #default unitary current is 1 pA
+        
+        ###end of old TK
         
         histograms = QGroupBox("Histogram options")
         histGrid = QGridLayout()
