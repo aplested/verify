@@ -53,12 +53,14 @@ class verifyGUI:
         
         self.master = master
         frame = Frame(master)
+        
+        # note this is not alawys going well with dark mode on MacOS
         frame.config(background="#dcdcdc")
         frame.config(borderwidth=5, relief=GROOVE)
         frame.place(relx=0.5, rely=0.5, anchor=CENTER)
         master.title('Verify v. 0.3')    #   Main frame title
         master.config(background="#dcdcdc")
-        master.geometry('820x750')
+        master.geometry('820x820')
         menubar = Menu(master)
         
         statmenu = Menu(menubar,tearoff=0)
