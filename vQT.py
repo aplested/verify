@@ -9,7 +9,7 @@ from datetime import datetime
 from PySide2 import QtCore, QtGui
 from PySide2.QtCore import Slot
 from PySide2 import __version__ as pyside_version
-from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QMessageBox, QFileDialog, QAction, QGroupBox, QHBoxLayout, QRadioButton, QDialog, QVBoxLayout, QCheckBox, QButtonGroup, QFrame
+from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QMessageBox, QFileDialog, QAction, QGroupBox, QHBoxLayout, QRadioButton, QDialog, QVBoxLayout, QCheckBox, QButtonGroup, QFrame, QLineEdit
 
 #package imports
 #import numpy as np
@@ -56,7 +56,7 @@ class VerifyMainWindow(QMainWindow):
 
     ### manualPeakToggle            :
     ### fitParabola                 : fitting parabolic function to the data
-    ###
+    ### readData
 
     
     def __init__(self, *args, **kwargs):
@@ -67,21 +67,12 @@ class VerifyMainWindow(QMainWindow):
         self.central_layout = QGridLayout()
         self.central_widget.setLayout(self.central_layout)
         self.setCentralWidget(self.central_widget)
-        self.resize(1500,800)           # works well on MacBook Retina display
-        
-        #self.conditions = []                    # conditions will be sheet names from xlsx
-        #self.datasetList_CBX = ['-']            # maintain our own list of datasets from the combobox
-        #self.extPa = {}                         # external parameters for the peak scraping dialog
-        #self.dataLock = True                    # when manual peak editing, lock to trace data
-        #self.noPeaks = True                     # were any peaks found yet?
-        #self.fitHistogramsOption = False        # histograms are not fitted by default, checkbox -> False later
-        #self.saveHistogramsOption = False       # histograms are not saved by default,  checkbox -> False later
+        self.resize(1000,800)           # works well on MacBook Retina display
         
         # setup main window widgets and menus
         self.createControlsWidgets()
         self.createPlotWidgets()
         self.createMenu()
-        #self.toggleDataSource = False
         
         
     def createMenu(self):
@@ -199,18 +190,17 @@ class VerifyMainWindow(QMainWindow):
         
         bsRange_label = QtGui.QLabel("Baseline range (pts)")###'0, 50'
         bsRange_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        self.bs_Range_entry = pg.SpinBox(value=100, step=10, bounds=[0, 250], delay=0)
+        self.bs_Range_entry = QLineEdit(text="0,50")
         self.bs_Range_entry.setFixedSize(60, 25)
         
         paramGrid.addWidget(unitaryAmp_label, 1, 0)
         paramGrid.addWidget(self.unitaryAmp_entry, 1, 1, 1, 2)
         
         paramGrid.addWidget(decimation_label, 2, 0)
-        paramGrid.addWidget(self.bs_Range_entry, 2, 1, 1, 2)
+        paramGrid.addWidget(self.decimation_entry, 2, 1, 1, 2)
         
         paramGrid.addWidget(bsRange_label, 3, 0)
-        paramGrid.addWidget(self.decimation_entry, 3, 1, 1, 2)
-        
+        paramGrid.addWidget(self.bs_Range_entry, 3, 1, 1, 2)
        
         d_divider = QHLine()
         d_divider.setFixedWidth(375)
@@ -223,13 +213,13 @@ class VerifyMainWindow(QMainWindow):
     
         #parameters.setFixedHeight(150)
         
-        controls.addWidget(actions, 0, 0, 1, 2 )
-        controls.addWidget(fileInfo, 0, 2, 1, 2 )
-        controls.addWidget(parameters, 0, 4, 1, 2)
+        controls.addWidget(actions, 0, 0, 1, 1 )
+        controls.addWidget(fileInfo, 0, 1, 1, 1 )
+        controls.addWidget(parameters, 0, 2, 1, 1)
         
         controls.setFixedWidth(900)
         
-        self.central_layout.addWidget(controls, row=0, col=0, rowspan=1,colspan=5)
+        self.central_layout.addWidget(controls, row=0, col=0, rowspan=1,colspan=2)
         return
     
     def createPlotWidgets(self):
@@ -242,8 +232,9 @@ class VerifyMainWindow(QMainWindow):
         self.p1 = self.plots.addPlot(y=data, row=self.p1rc[0], col=self.p1rc[1], rowspan=3, colspan=1)
         self.p1.setTitle(title="Traces", color="F0F0F0", justify="right")
         self.p1.setLabel('left', "Current(pA)")
-        self.p1.setLabel('bottom', "Time (s)")
+        self.p1.setLabel('bottom', "Samples")
         self.p1.vb.setLimits(xMin=0)
+        self.p1.setFixedWidth(400)
         #just a blank for now, populate after loading data to get the right number of split graphs
         
         self.p2rc = (1,1)
@@ -259,9 +250,9 @@ class VerifyMainWindow(QMainWindow):
         
         
         self.plots.peakslabel = pg.LabelItem(text='', justify='left')
+        self.plots.setFixedWidth(900)
         
-        
-        self.central_layout.addWidget(self.plots, row=1, col=0, rowspan=1,colspan=3)
+        self.central_layout.addWidget(self.plots, row=1, col=0, rowspan=1,colspan=1)
      
     def read_Data(self, file_type):
         """"Asks for a excel tab-delim to use for verification test.
@@ -294,25 +285,26 @@ class VerifyMainWindow(QMainWindow):
         return input_traces, data_file_name
 
     def getResult(self):
-        self.unitary = float(self.ua.get())
+        self.unitary = float(self.unitaryAmp_entry.value())
         print(("Taking unitary current from GUI:  {} pA".format(self.unitary)))
 
-        self.decimation = int(self.de.get())
+        self.decimation = int(self.decimation_entry.value())
         print(("Decimating by {} according to GUI".format(self.decimation)))
 
-        #decimate but preserve the original files in case user wants to run again with different decimation etc
+        #decimate but preserve the original files in case user wants to re-run with different decimation
         if self.decimation > 1:
             self.dec_traces = decimate_traces(self.input_traces, self.decimation)
         else:
             self.dec_traces = self.input_traces
         
-        self.baseline_range = [int(x) for x in self.br.get().split(",")]
+        rawBsRangeText = str(self.bs_Range_entry.text())
+        self.baseline_range = [int(x) for x in rawBsRangeText.split(",")]
         print(("Taking baseline range from GUI. Points from {} to {}".format(self.baseline_range[0], self.baseline_range[1])))
         
         self.input_traces, message = clean_bad_baselines(self.dec_traces, self.baseline_range)
-        print(("Message from CLEAN BAD: "+message))
+        print("Message from CLEAN_BAD_BASELINES:/n" + message)
         self.input_traces, self.difference_traces, messages, self.output_header = construct_diffs(self.dec_traces, self.unitary, self.baseline_range)
-        print(("Messages from CONSTRUCT_DIFFS: "+messages))
+        print("Messages from CONSTRUCT_DIFFS:/n" + messages)
         self.verified_output = final_prep(self.dec_traces, self.difference_traces, self.baseline_range)
 
         #the following are used for plotting
@@ -320,7 +312,7 @@ class VerifyMainWindow(QMainWindow):
         self.meanI = self.verified_output[0]
     
     
-    
+    #not used in Verify
     def mouseMoved(self, evt):
         """Crosshair in p3 shown during manual fitting"""
         if self.autoPeaks == False:
@@ -343,8 +335,6 @@ class VerifyMainWindow(QMainWindow):
                 self.plots.cursorlabel.setText("Cursor: x={: .2f}, y={: .3f}".format(ch_x, ch_y))
     
     
-
-    
     def loadTraces(self):
         """Called by Load traces button"""
         self.input_traces, self.dfile = self.read_Data('excel')
@@ -352,24 +342,26 @@ class VerifyMainWindow(QMainWindow):
         if self.dfile != None:
             self.input_filename_label.setText('Data loaded from \n' + self.dfile)
             self.verifyTracesBtn.setEnabled(True)    #turn on VERIFY button
-            self.p.prepTracePlot(self.input_traces[0])
-            self.p.addTitle("First trace in {}".format(self.dfile))
-            self.p.drawTrace()
+            for trace in self.input_traces:
+                self.p1.plot(trace)
+            self.p1.addLabel("All traces in {}".format(self.dfile))
+            #self.p.drawTrace()
         else:
             self.input_filename_label.set('No data loaded')
     
     def verifyTraces(self):
         """Called by VERIFY button"""
         #send traces to be checked
-        print ("Verify")
+        print ("Sending traces to Verify")
         
         #results are stored in self.verified_output
         self.getResult()
         
         #default
         out_filename = "verified.txt"
+        
         #determine filename option
-        opt = self.v.get()
+        """opt = self.v.get()
         
         if opt == 2:
             out_filename = self.getOutputFilename()
@@ -377,11 +369,10 @@ class VerifyMainWindow(QMainWindow):
             out_filename = file_tools.addFilenamePrefix(self.dfile, prefix="v_")
         elif opt == 0:
             out_filename = file_tools.addFilenamePrefix(self.dfile, prefix=datetime.now().strftime("%y%m%d-%H%M%S") + "_v_")
-        self.b5.config(state=NORMAL)
-        #plot preview of current variance automatically
-        self.pcv.prep2DPlot(self.meanI, self.ensVariance)
-        self.pcv.addTitle("Preview of Current Variance Plot")
-        self.pcv.draw2D()
+        """
+        #self.b5.config(state=NORMAL)
+        self.p2.clear()
+        self.p2.plot(self.verified_output[0], self.verified_output[1], pen=(3))
         
         write_output (self.verified_output, self.output_header, out_filename)
     
@@ -454,53 +445,6 @@ class VerifyMainWindow(QMainWindow):
         self.createLinearRegion()
         #return
 
-
-    
-    def manualUpdate(self):
-        """Some editing was done in p3, so update other windows accordingly"""
-        print ('Peak data in p3 changed manually')
-       
-        _sel_condi = self.p3Selection.currentText()
-        _ROI = self.ROI_selectBox.currentText()
-        
-        # update the peaks in p1 and histograms only
-        utils.removeAllScatter(self.p1, verbose=False)
-        
-        #update p2 histograms
-        self.updateHistograms()
-        
-        for i, _condi in enumerate(self.conditions):
-            #colours
-            col_series = (i, len(self.conditions))
-            
-            if _sel_condi == _condi :
-                _scatter = utils.findScatter(self.p3.items)
-                # sometimes a new scatter is made and this "deletes" the old one
-                # retrieve the current manually curated peak data
-                if _scatter is None:
-                    print ('No Scatter found, empty data.')
-                    xp = []
-                    yp = []
-                else:
-                    xp, yp = _scatter.getData()
-                
-                # write peaks into results
-                self.workingDataset.resultsDF.addPeaks(_ROI, _sel_condi, xp, yp)
-                # print (self.workingDataset.resultsDF.df[_ROI])
-             
-            xp, yp = self.workingDataset.resultsDF.getPeaks(_ROI, _condi)
-            
-            if self.split_traces:
-                _target = self.p1stackMembers[i]
-                # only one scatter item in each split view
-                _t_scat = utils.findScatter(_target.items)
-                _t_scat.setData(xp, yp, brush=col_series)
-                
-            else:
-                self.p1.plot(xp, yp, pen=None, symbol="s", symbolBrush=col_series)
-            
-            self.plots.peakslabel.setText("{} peaks in {} condition.".format(len(yp), _condi))
-                
         
     def setRanges(self):
         """ Collect the extremities of data over a set of conditions """

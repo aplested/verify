@@ -26,7 +26,7 @@ def rmsd(data):
 	return sqrt(mean_sq_dev)
 
 
-def baseline_subtract (trace,start=0,end=99):
+def baseline_subtract (trace, start=0, end=99):
 	"""Subtract the mean of first 100 points (default) from a trace to correct leak"""
 	
 	mean_bs = mean (trace[start:end])			
@@ -37,7 +37,7 @@ def baseline_subtract (trace,start=0,end=99):
 	
 	return trace_bs_subtracted
 
-def baselines_quality (traces,start=0,end=99):
+def baselines_quality (traces, start=0, end=99):
 	"""Calculate the mean and RMSD of baseline variance for a set of traces"""
 	bs_var_of_traces = []	
 
@@ -65,7 +65,7 @@ def traces_average (traces):
 	
 	return average
 
-def traces_scale (traces,gain=1):
+def traces_scale (traces, gain=1):
 	"""Scale a set of traces"""
 	scaled_traces =[]
 	for trace in traces:
@@ -73,14 +73,14 @@ def traces_scale (traces,gain=1):
 		scaled_traces.append(x)		
 	return scaled_traces
 
-def trace_scale (trace,gain=1):
+def trace_scale (trace, gain=1):
 	"""Scale trace"""
 	scaled = []
 	for point in trace:
 		scaled.append(point * gain)
 	return scaled
 
-def decimate_traces(traces,decimation=1):
+def decimate_traces(traces, decimation=1):
 	decimated_traces = []
 	for trace in traces:
 		decimated = []
@@ -91,7 +91,7 @@ def decimate_traces(traces,decimation=1):
 	
 	return decimated_traces
 
-def chop_traces(traces,begin,end):
+def chop_traces(traces, begin, end):
 	"""Remove junk from beginning and end of trace """
 	
 	chopped_traces = []
