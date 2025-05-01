@@ -31,6 +31,10 @@ import pyqtgraph as pg
 __author__="Andrew"
 __date__ ="$29-Apr-2025$"
 
+# todo: Add logger
+#       Add Parabola fit (with SciPy?)
+
+
 #not sure if we need this
 class QHLine(QFrame):
     ### from https://stackoverflow.com/questions/5671354
@@ -74,8 +78,8 @@ class VerifyMainWindow(QMainWindow):
         #self.saveHistogramsOption = False       # histograms are not saved by default,  checkbox -> False later
         
         # setup main window widgets and menus
-        self.createPlotWidgets()
         self.createControlsWidgets()
+        self.createPlotWidgets()
         self.createMenu()
         #self.toggleDataSource = False
         
@@ -120,24 +124,113 @@ class VerifyMainWindow(QMainWindow):
     def getStarted(self):
         
         introduction ="""
-    ---- Verify fluctuations from ion channel noise in difference records ----\n
-    according to expectation of not exceeding 7 SD\
-    (from Heinemann and Conti 'Methods in Enzymology' 207).
-    Takes input from tab-delimited Excel file 'file.txt' with columns being current traces.
-    * Mean and variance are computed for the set to use in noise limit test.
-    * Baseline noise is determined for each difference trace from the first hundred points (2 ms at 50 kHz)
-    * Traces with extremely noisy baselines are removed.
-    * Traces that exceed the 7 SD limit are removed and the failing points are explicitly listed to the terminal.
-    Output is tab delimited text file with columns consisting of mean, variance and verified difference traces, default to 'verified.txt'
-    """
+        ---- Verify fluctuations from ion channel noise in difference records ----\n
+        according to expectation of not exceeding 7 SD\
+        (from Heinemann and Conti 'Methods in Enzymology' 207).
+        Takes input from tab-delimited Excel file 'file.txt' with columns being current traces.
+        * Mean and variance are computed for the set to use in noise limit test.
+        * Baseline noise is determined for each difference trace from the first hundred points (2 ms at 50 kHz)
+        * Traces with extremely noisy baselines are removed.
+        * Traces that exceed the 7 SD limit are removed and the failing points are explicitly listed to the terminal.
+        Output is tab delimited text file with columns consisting of mean, variance and verified difference traces, default to 'verified.txt'
+        """
         
-        QMessageBox.information(self, "Getting Started", introduction)
+        QMessageBox.information(self, "Getting Started/n", introduction)
         
     def plotVC(self):
         print ("plot Current variance")
     
     def fitParabola(self):
         print ("Fit parabola")
+    
+    def createControlsWidgets(self):
+        """control panel"""
+        
+        controls = pg.LayoutWidget()
+        
+        actions = QGroupBox("Actions")
+        actionsGrid = QGridLayout()
+        
+        # load dataset button
+        loadDataBtn = QtGui.QPushButton('Load traces')
+        loadDataBtn.clicked.connect(self.loadTraces)
+        
+        self.verifyTracesBtn = QtGui.QPushButton('Verify traces for variance')
+        self.verifyTracesBtn.setEnabled(False)
+        self.verifyTracesBtn.clicked.connect(self.verifyTraces)
+        
+        self.plotVCBtn = QtGui.QPushButton('Plot Variance vs. current')
+        self.plotVCBtn.setEnabled(False)
+        self.plotVCBtn.clicked.connect(self.plotVC)
+               
+        self.fitParabolaBtn = QtGui.QPushButton('Fit Parabola')
+        self.fitParabolaBtn.setEnabled(False)
+        self.fitParabolaBtn.clicked.connect(self.fitParabola)
+        
+        actionsGrid.addWidget(loadDataBtn, 1, 0)
+        actionsGrid.addWidget(self.verifyTracesBtn, 2, 0)
+        actionsGrid.addWidget(self.plotVCBtn, 3, 0)
+        actionsGrid.addWidget(self.fitParabolaBtn, 4, 0)
+        
+        actions.setLayout(actionsGrid)
+        
+        fileInfo = QGroupBox("File Information")
+        fileInfoGrid = QGridLayout()
+        
+        self.input_filename_label = QtGui.QLabel("No data loaded yet")
+        fileInfoGrid.addWidget(self.input_filename_label, 1, 0, 1, 1)
+        
+        fileInfo.setLayout(fileInfoGrid)
+        
+        parameters = QGroupBox("Parameters")
+        paramGrid = QGridLayout()
+        
+        unitaryAmp_label = QtGui.QLabel("Unitary Current Amplitude (pA)")
+        #default unitary current is 1 pA
+        unitaryAmp_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        self.unitaryAmp_entry = pg.SpinBox(value=1, step=0.2, bounds=[0.2, 20], delay=0) #need to change
+        self.unitaryAmp_entry.setFixedSize(60, 25)
+        
+        decimation_label = QtGui.QLabel("Decimation (pts)")###'0, 50'
+        decimation_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        self.decimation_entry = pg.SpinBox(value=1, step=1, bounds=[1, 20], delay=0)
+        self.decimation_entry.setFixedSize(60, 25)
+        
+        
+        bsRange_label = QtGui.QLabel("Baseline range (pts)")###'0, 50'
+        bsRange_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+        self.bs_Range_entry = pg.SpinBox(value=100, step=10, bounds=[0, 250], delay=0)
+        self.bs_Range_entry.setFixedSize(60, 25)
+        
+        paramGrid.addWidget(unitaryAmp_label, 1, 0)
+        paramGrid.addWidget(self.unitaryAmp_entry, 1, 1, 1, 2)
+        
+        paramGrid.addWidget(decimation_label, 2, 0)
+        paramGrid.addWidget(self.bs_Range_entry, 2, 1, 1, 2)
+        
+        paramGrid.addWidget(bsRange_label, 3, 0)
+        paramGrid.addWidget(self.decimation_entry, 3, 1, 1, 2)
+        
+       
+        d_divider = QHLine()
+        d_divider.setFixedWidth(375)
+        
+        paramGrid.addWidget(d_divider, 4, 0, 1, -1)
+      
+        parameters.setLayout(paramGrid)
+        
+        #stack widgets into control panel
+    
+        #parameters.setFixedHeight(150)
+        
+        controls.addWidget(actions, 0, 0, 1, 2 )
+        controls.addWidget(fileInfo, 0, 2, 1, 2 )
+        controls.addWidget(parameters, 0, 4, 1, 2)
+        
+        controls.setFixedWidth(900)
+        
+        self.central_layout.addWidget(controls, row=0, col=0, rowspan=1,colspan=5)
+        return
     
     def createPlotWidgets(self):
         """analysis plots"""
@@ -147,13 +240,18 @@ class VerifyMainWindow(QMainWindow):
         self.plots = pg.GraphicsLayoutWidget()
         self.p1rc = (1,0)
         self.p1 = self.plots.addPlot(y=data, row=self.p1rc[0], col=self.p1rc[1], rowspan=3, colspan=1)
-        self.p1.setTitle(title="Traces and background subtraction", color="F0F0F0", justify="right")
-        self.p1.setLabel('left', "dF / F")
+        self.p1.setTitle(title="Traces", color="F0F0F0", justify="right")
+        self.p1.setLabel('left', "Current(pA)")
         self.p1.setLabel('bottom', "Time (s)")
         self.p1.vb.setLimits(xMin=0)
         #just a blank for now, populate after loading data to get the right number of split graphs
-        self.p1stack = pg.GraphicsLayout()
         
+        self.p2rc = (1,1)
+        self.p2 = self.plots.addPlot(y=data, row=self.p2rc[0], col=self.p2rc[1], rowspan=3, colspan=1)
+        self.p2.setTitle(title="Current-Variance", color="F0F0F0", justify="right")
+        self.p2.setLabel('left', "Variance (pA^2)")
+        self.p2.setLabel('bottom', "Current (pA)")
+        self.p2.vb.setLimits(xMin=0)
                 
         # what does this do??
         #self.p3.scene().sigMouseClicked.connect(self.clickRelay)
@@ -163,9 +261,37 @@ class VerifyMainWindow(QMainWindow):
         self.plots.peakslabel = pg.LabelItem(text='', justify='left')
         
         
-        self.central_layout.addWidget(self.plots, row=0, col=0, rowspan=1,colspan=2)
+        self.central_layout.addWidget(self.plots, row=1, col=0, rowspan=1,colspan=3)
      
-     
+    def read_Data(self, file_type):
+        """"Asks for a excel tab-delim to use for verification test.
+        file_type :string, can be txt or excel... no meaning here.
+        """
+        
+        data_file_name = QFileDialog.getOpenFileName(self,
+            "Open Data", os.path.expanduser("~"))[0]
+
+        if data_file_name == "":
+            return None, None
+        
+        try:
+            data_in_lines = file_tools.file_read(data_file_name)#, file_type)
+        except:
+            print ("Error opening file")
+            return None, None
+
+        try:
+            input_traces = lines_into_traces (data_in_lines)
+        except:
+            print ("error converting loaded data, check the format")
+            return None, None
+
+        #input_traces = traces_scale(in_traces,5)            # optional scaling if gain wrong
+        print(("Read {} traces from file".format(len(input_traces))))
+    
+        # Imagine taking a header here, with data titles?
+
+        return input_traces, data_file_name
 
     def getResult(self):
         self.unitary = float(self.ua.get())
@@ -218,137 +344,14 @@ class VerifyMainWindow(QMainWindow):
     
     
 
-     
-    def createControlsWidgets(self):
-        """control panel"""
-        
-        controls = pg.LayoutWidget()
-        
-        actions = QGroupBox("Actions")
-        actionsGrid = QGridLayout()
-        
-        # load dataset button
-        loadDataBtn = QtGui.QPushButton('Load traces')
-        loadDataBtn.clicked.connect(self.loadTraces)
-        
-        verifyTracesBtn = QtGui.QPushButton('Verify traces for variance')
-        verifyTracesBtn.clicked.connect(self.verifyTraces)
-        
-        plotVCBtn = QtGui.QPushButton('Plot Variance vs. current')
-        plotVCBtn.clicked.connect(self.plotVC)
-               
-        fitParabolaBtn = QtGui.QPushButton('Fit Parabola')
-        fitParabolaBtn.clicked.connect(self.fitParabola)
-        
-        actionsGrid.addWidget(loadDataBtn, 1, 0)
-        actionsGrid.addWidget(verifyTracesBtn, 2, 0)
-        actionsGrid.addWidget(plotVCBtn, 3, 0)
-        actionsGrid.addWidget(fitParabolaBtn, 4, 0)
-        
-        actions.setLayout(actionsGrid)
-        
-        ### old TK needs to be fixed
-        self.input_filename_label = StringVar()
-        self.input_filename_label.set("No data loaded yet")
-        self.l1 = Label(frame, textvariable=self.input_filename_label, width=40, bg="#dcdcdc")
-        self.l1.grid(row=0, column=2, columnspan=4, pady=5)
-        
-        
-        Label(frame, text="Baseline range (pts)", bg="#dcdcdc").grid(row=1, column=2, columnspan=2, pady=5, sticky=E)
-        self.br = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
-        self.br.grid(row=1, column=4, sticky=W, pady=5)
-        self.br.insert(END, '0, 50')
-        
-        Label(frame, text="Decimation", bg="#dcdcdc").grid(row=2, column=2, columnspan=2, pady=5, sticky=E)
-        self.de = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
-        self.de.grid(row=2, column=4, sticky=W, pady=5)
-        self.de.insert(END, '1')
-        
-        
-        Label(frame, text="Unitary current amplitude (pA)", bg="#dcdcdc").grid(row=3, column=2, columnspan=2, pady=5, sticky=E)
-        self.ua = Entry(frame, justify=CENTER, width=5, highlightbackground="#dcdcdc")
-        self.ua.grid(row=3, column=4, sticky=W, pady=5)
-        self.ua.insert(END, '1')
-        #default unitary current is 1 pA
-        
-        ###end of old TK
-        
-        histograms = QGroupBox("Histogram options")
-        histGrid = QGridLayout()
-        
-        NBin_label = QtGui.QLabel("No. of bins")
-        NBin_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        self.histo_NBin_Spin = pg.SpinBox(value=100, step=10, bounds=[0, 250], delay=0)
-        self.histo_NBin_Spin.setFixedSize(60, 25)
-        
-        histGrid.addWidget(NBin_label, 2, 0)
-        histGrid.addWidget(self.histo_NBin_Spin, 2, 1, 1, 2)
-        
-        d_divider = QHLine()
-        d_divider.setFixedWidth(375)
-        
-        histGrid.addWidget(d_divider, 4, 0, 1, -1)
-      
-        histograms.setLayout(histGrid)
-    
-        # Baseline controls box
-        baseline = QGroupBox("Automatic baseline cleanup")
-        base_grid = QGridLayout()
-        auto_bs_label = QtGui.QLabel("Baseline removal?")
-        auto_bs_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        self.autobs_Box = pg.ComboBox()
-        self.autobs_Box.addItems(['Auto', 'None', 'Lock'])
-        self.autobs_Box.setFixedSize(70, 25)
-  
-        
-        # parameters for the auto baseline algorithm
-        auto_bs_lam_label = QtGui.QLabel("lambda")
-        auto_bs_lam_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        self.auto_bs_lam_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
-        self.auto_bs_lam_slider.setTickPosition(QtGui.QSlider.TicksBothSides)
-        self.auto_bs_lam_slider.setMinimum(2)
-        self.auto_bs_lam_slider.setMaximum(9)
-        self.auto_bs_lam_slider.setValue(6)
-        self.auto_bs_lam_slider.setFixedSize(100, 25)
-        #self.auto_bs_lam_slider.valueChanged.connect()   connect it to something
-        
-        
-        base_grid.addWidget(auto_bs_label, 0, 0, 1, 2)
-        base_grid.addWidget(self.autobs_Box, 0, 2, 1, 1)
-        base_grid.addWidget(auto_bs_lam_label, 1, 3)
-        base_grid.addWidget(self.auto_bs_lam_slider, 1, 4, 1, 2)
-        
-     
-        baseline.setLayout(base_grid)
-        
-        
-       
-    
-        #stack widgets into control panel
-    
-        baseline.setFixedHeight(150)
-       
-        histograms.setFixedHeight(150)
-        
- 
-        controls.addWidget(baseline, 2, 0 , 1, -1)
-        
-        controls.addWidget(actions, 3, 0, 1, -1)
-  
-        controls.addWidget(histograms, 5 , 0, 1, -1)
-        
-        controls.setFixedWidth(420)
-        
-        self.central_layout.addWidget(controls, 0, 3, -1, 1)
-        return
     
     def loadTraces(self):
-        'Called by Load traces button'
+        """Called by Load traces button"""
         self.input_traces, self.dfile = self.read_Data('excel')
         #dfile contains source data path and filename
         if self.dfile != None:
-            self.input_filename_label.set('Data loaded from ' + self.dfile)
-            self.b4.config(state=NORMAL)    #turn on VERIFY button
+            self.input_filename_label.setText('Data loaded from \n' + self.dfile)
+            self.verifyTracesBtn.setEnabled(True)    #turn on VERIFY button
             self.p.prepTracePlot(self.input_traces[0])
             self.p.addTitle("First trace in {}".format(self.dfile))
             self.p.drawTrace()
@@ -356,7 +359,7 @@ class VerifyMainWindow(QMainWindow):
             self.input_filename_label.set('No data loaded')
     
     def verifyTraces(self):
-        'Called by VERIFY button'
+        """Called by VERIFY button"""
         #send traces to be checked
         print ("Verify")
         
@@ -725,9 +728,8 @@ class VerifyMainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-    # Change menubar name from 'python' to 'Verify' on macOS
-    # Doesn't appear to work
-    # from https://stackoverflow.com/questions/5047734/
+  
+    # modified from https://stackoverflow.com/questions/5047734/
     if sys.platform.startswith('darwin'):
     # Python 3: pyobjc-framework-Cocoa is needed
         try:
@@ -744,7 +746,6 @@ if __name__ == "__main__":
         except ImportError:
             print ("Failed to import NSBundle, couldn't change menubar name." )
             
-    
     __version__ = "v. 0.5"
     #print (sys.version)
     app = QApplication([])
