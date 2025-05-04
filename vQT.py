@@ -139,42 +139,22 @@ class VerifyMainWindow(QMainWindow):
         
         controls = pg.LayoutWidget()
         
-        actions = QGroupBox("Actions")
-        actionsGrid = QGridLayout()
+        fileActions = QGroupBox("File Actions")
+        fileGrid = QGridLayout()
         
         # load dataset button
         loadDataBtn = QtGui.QPushButton('Load traces')
         loadDataBtn.clicked.connect(self.loadTraces)
-        
-        self.verifyTracesBtn = QtGui.QPushButton('Verify traces for variance')
-        self.verifyTracesBtn.setEnabled(False)
-        self.verifyTracesBtn.clicked.connect(self.verifyTraces)
-        
-        self.plotVCBtn = QtGui.QPushButton('Plot Variance vs. current')
-        self.plotVCBtn.setEnabled(False)
-        self.plotVCBtn.clicked.connect(self.plotVC)
-               
-        self.fitParabolaBtn = QtGui.QPushButton('Fit Parabola')
-        self.fitParabolaBtn.setEnabled(False)
-        self.fitParabolaBtn.clicked.connect(self.fitParabola)
-        
-        actionsGrid.addWidget(loadDataBtn, 1, 0)
-        actionsGrid.addWidget(self.verifyTracesBtn, 2, 0)
-        actionsGrid.addWidget(self.plotVCBtn, 3, 0)
-        actionsGrid.addWidget(self.fitParabolaBtn, 4, 0)
-        
-        actions.setLayout(actionsGrid)
-        
-        fileInfo = QGroupBox("File Information")
-        fileInfoGrid = QGridLayout()
+        fileGrid.addWidget(loadDataBtn, 1, 0)
         
         self.input_filename_label = QtGui.QLabel("No data loaded yet")
-        fileInfoGrid.addWidget(self.input_filename_label, 1, 0, 1, 1)
+        fileGrid.addWidget(self.input_filename_label, 2, 0, 1, 1)
         
-        fileInfo.setLayout(fileInfoGrid)
+        fileActions.setLayout(fileGrid)
         
-        parameters = QGroupBox("Parameters")
-        paramGrid = QGridLayout()
+        
+        verifyControls = QGroupBox("Verify Controls")
+        verifyControlsGrid = QGridLayout()
         
         unitaryAmp_label = QtGui.QLabel("Unitary Current Amplitude (pA)")
         #default unitary current is 1 pA
@@ -187,35 +167,60 @@ class VerifyMainWindow(QMainWindow):
         self.decimation_entry = pg.SpinBox(value=1, step=1, bounds=[1, 20], delay=0)
         self.decimation_entry.setFixedSize(60, 25)
         
-        
         bsRange_label = QtGui.QLabel("Baseline range (pts)")###'0, 50'
         bsRange_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         self.bs_Range_entry = QLineEdit(text="0,50")
         self.bs_Range_entry.setFixedSize(60, 25)
         
-        paramGrid.addWidget(unitaryAmp_label, 1, 0)
-        paramGrid.addWidget(self.unitaryAmp_entry, 1, 1, 1, 2)
-        
-        paramGrid.addWidget(decimation_label, 2, 0)
-        paramGrid.addWidget(self.decimation_entry, 2, 1, 1, 2)
-        
-        paramGrid.addWidget(bsRange_label, 3, 0)
-        paramGrid.addWidget(self.bs_Range_entry, 3, 1, 1, 2)
-       
         d_divider = QHLine()
         d_divider.setFixedWidth(375)
         
-        paramGrid.addWidget(d_divider, 4, 0, 1, -1)
-      
-        parameters.setLayout(paramGrid)
+        self.verifyTracesBtn = QtGui.QPushButton('Verify traces for variance')
+        self.verifyTracesBtn.setEnabled(False)
+        self.verifyTracesBtn.clicked.connect(self.verifyTraces)
         
+        verifyControlsGrid.addWidget(unitaryAmp_label, 1, 0)
+        verifyControlsGrid.addWidget(self.unitaryAmp_entry, 1, 1, 1, 2)
+        
+        verifyControlsGrid.addWidget(decimation_label, 2, 0)
+        verifyControlsGrid.addWidget(self.decimation_entry, 2, 1, 1, 2)
+        
+        verifyControlsGrid.addWidget(bsRange_label, 3, 0)
+        verifyControlsGrid.addWidget(self.bs_Range_entry, 3, 1, 1, 2)
+        
+        verifyControlsGrid.addWidget(d_divider, 4, 0, 1, -1)
+        
+        verifyControlsGrid.addWidget(self.verifyTracesBtn, 5, 0)
+       
+        verifyControls.setLayout(verifyControlsGrid)
+    
+    
+    
+        fittingControls = QGroupBox("Fitting")
+        fittingControlsGrid = QGridLayout()
+        
+        self.plotVCBtn = QtGui.QPushButton('Plot Variance vs. current')
+        self.plotVCBtn.setEnabled(False)
+        self.plotVCBtn.clicked.connect(self.plotVC)
+               
+        self.fitParabolaBtn = QtGui.QPushButton('Fit Parabola')
+        self.fitParabolaBtn.setEnabled(False)
+        self.fitParabolaBtn.clicked.connect(self.fitParabola)
+    
+                
+        fittingControlsGrid.addWidget(self.plotVCBtn, 3, 0)
+        fittingControlsGrid.addWidget(self.fitParabolaBtn, 4, 0)
+
+        fittingControls.setLayout(fittingControlsGrid)
+    
         #stack widgets into control panel
     
         #parameters.setFixedHeight(150)
         
-        controls.addWidget(actions, 0, 0, 1, 1 )
-        controls.addWidget(fileInfo, 0, 1, 1, 1 )
-        controls.addWidget(parameters, 0, 2, 1, 1)
+        controls.addWidget(fileActions, 0, 0, 1, 1 )
+        controls.addWidget(verifyControls, 0, 1, 1, 1)
+        controls.addWidget(fittingControls, 0, 2, 1, 1 )
+        
         
         controls.setFixedWidth(900)
         
