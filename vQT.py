@@ -12,7 +12,7 @@ from PySide2 import __version__ as pyside_version
 from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QMessageBox, QFileDialog, QAction, QGroupBox, QHBoxLayout, QRadioButton, QDialog, QVBoxLayout, QCheckBox, QButtonGroup, QFrame, QLineEdit
 
 #package imports
-#import numpy as np
+import numpy as np
 #import pandas as pd
 #from scipy import __version__ as scipy_version
 #import scipy.signal as scsig
@@ -24,6 +24,7 @@ import file_tools
 from trace_tools import decimate_traces
 from Plot import *
 from noise import *
+from parabola import fitParabola
 
 #Import pg last to avoid namespace-overwrite problems?
 import pyqtgraph as pg
@@ -55,9 +56,9 @@ class VerifyMainWindow(QMainWindow):
     ### mouseMoved                  : when the mouse moves in zoom
 
     ### manualPeakToggle            :
-    ### fitParabola                 : fitting parabolic function to the data
+    ### fitData                : fitting parabolic function to the data
     ### readData
-
+    
     
     def __init__(self, *args, **kwargs):
         super(VerifyMainWindow, self).__init__(*args, **kwargs)
@@ -86,7 +87,7 @@ class VerifyMainWindow(QMainWindow):
         self.file_menu.addAction("Open File", self.open_file)
         self.file_menu.addAction("Save Data", self.save_peaks)
         
-        self.analysis_menu.addAction("fit parabola", self.fitParabola)
+        self.analysis_menu.addAction("fit parabola", self.fitData)
         
         self.help_menu.addAction("Getting Started", self.getStarted)
     
@@ -131,9 +132,27 @@ class VerifyMainWindow(QMainWindow):
     def plotVC(self):
         print ("plot Current variance")
     
-    def fitParabola(self):
+    def fitData(self):
         print ("Fit parabola")
+        fitResult = fitParabola([self.meanI, self.ensVariance])
+        print (fitResult)
+        self.x = fitResult.x
+        self.addFit()
     
+    def addFit(self):
+        
+        #get max current
+        maxCurrent = self.meanI.max()
+        #construct range array
+        fitCurrents = np.linspace(0, maxCurrent)
+        
+        print (maxCurrent, fitCurrents)
+        #map vector according to fit results
+        fittedVariance = self.x[0] * fitCurrents - fitCurrents ** 2 / self.x[1]
+        #add to p2
+        self.p2.plot(fitCurrents, fittedVariance, pen=(2))
+        
+        
     def createControlsWidgets(self):
         """control panel"""
         
@@ -205,7 +224,7 @@ class VerifyMainWindow(QMainWindow):
                
         self.fitParabolaBtn = QtGui.QPushButton('Fit Parabola')
         self.fitParabolaBtn.setEnabled(False)
-        self.fitParabolaBtn.clicked.connect(self.fitParabola)
+        self.fitParabolaBtn.clicked.connect(self.fitData)
     
                 
         fittingControlsGrid.addWidget(self.plotVCBtn, 3, 0)
@@ -313,8 +332,8 @@ class VerifyMainWindow(QMainWindow):
         self.verified_output = final_prep(self.dec_traces, self.difference_traces, self.baseline_range)
 
         #the following are used for plotting
-        self.ensVariance = self.verified_output[1]
-        self.meanI = self.verified_output[0]
+        self.ensVariance = np.array(self.verified_output[1])
+        self.meanI = np.array(self.verified_output[0])
     
     
     #not used in Verify

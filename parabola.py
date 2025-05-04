@@ -24,8 +24,6 @@ def fitParabola (data):
     return optimize.least_squares(errfunc, guesses, bounds = (0, np.inf))
 
     
-
-
 if __name__ == "__main__":
 
     #### easy variance current data
