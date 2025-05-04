@@ -1,7 +1,7 @@
 # verify
 
 Version 0.5
-Check the variance of electrophysiological recordings for noise analysis. Tkinter GUI version.
+Check the variance of electrophysiological recordings for noise analysis
 
 branch python3 is updated for Python3 and MacOS Sequoia 
 branch vqt is updated for Python3 and Qt (because Tkinter is limiting and no longer distributed with macOS)
