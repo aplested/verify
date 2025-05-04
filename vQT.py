@@ -167,12 +167,14 @@ class VerifyMainWindow(QMainWindow):
         fileGrid.addWidget(loadDataBtn, 1, 0)
         
         self.input_filename_label = QtGui.QLabel("No data loaded yet")
+        self.input_filename_label.setWordWrap(True)
         fileGrid.addWidget(self.input_filename_label, 2, 0, 1, 1)
         
+        fileActions.setFixedWidth(300)
         fileActions.setLayout(fileGrid)
         
         
-        verifyControls = QGroupBox("Verify Controls")
+        verifyControls = QGroupBox("Verify Traces for Variance")
         verifyControlsGrid = QGridLayout()
         
         unitaryAmp_label = QtGui.QLabel("Unitary Current Amplitude (pA)")
@@ -192,9 +194,9 @@ class VerifyMainWindow(QMainWindow):
         self.bs_Range_entry.setFixedSize(60, 25)
         
         d_divider = QHLine()
-        d_divider.setFixedWidth(375)
+        d_divider.setFixedWidth(300)
         
-        self.verifyTracesBtn = QtGui.QPushButton('Verify traces for variance')
+        self.verifyTracesBtn = QtGui.QPushButton('Verify traces')
         self.verifyTracesBtn.setEnabled(False)
         self.verifyTracesBtn.clicked.connect(self.verifyTraces)
         
@@ -226,15 +228,24 @@ class VerifyMainWindow(QMainWindow):
         self.fitParabolaBtn.setEnabled(False)
         self.fitParabolaBtn.clicked.connect(self.fitData)
     
-                
-        fittingControlsGrid.addWidget(self.plotVCBtn, 3, 0)
+        #not connected up yet
+        fitRange_label = QtGui.QLabel("Fit range (current)")
+        fitRange_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.fit_Range_entry = QLineEdit(text="0,10")
+        self.fit_Range_entry.setFixedSize(60, 25)
+        
+        # could split the data at the peak
+        # fit both arms with the same N but different i?
+        # binning
+    
+        fittingControlsGrid.addWidget(self.plotVCBtn, 2, 0)
+        fittingControlsGrid.addWidget(fitRange_label, 3, 0)
+        fittingControlsGrid.addWidget(self.fit_Range_entry,3, 1, 1, 2)
         fittingControlsGrid.addWidget(self.fitParabolaBtn, 4, 0)
-
+        
         fittingControls.setLayout(fittingControlsGrid)
     
         #stack widgets into control panel
-    
-        #parameters.setFixedHeight(150)
         
         controls.addWidget(fileActions, 0, 0, 1, 1 )
         controls.addWidget(verifyControls, 0, 1, 1, 1)
@@ -331,9 +342,11 @@ class VerifyMainWindow(QMainWindow):
         print("Messages from CONSTRUCT_DIFFS:/n" + messages)
         self.verified_output = final_prep(self.dec_traces, self.difference_traces, self.baseline_range)
 
-        #the following are used for plotting
+        #the following are used for simple plotting
         self.ensVariance = np.array(self.verified_output[1])
         self.meanI = np.array(self.verified_output[0])
+        
+        self.fitParabolaBtn.setEnabled(True)
     
     
     #not used in Verify
