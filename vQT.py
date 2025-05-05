@@ -3,6 +3,7 @@ import os.path
 import platform
 import copy
 from datetime import datetime
+import time
 #import itertools
 
 #PySide2 imports
@@ -32,11 +33,32 @@ import pyqtgraph as pg
 __author__="Andrew"
 __date__ ="$29-Apr-2025$"
 
-# todo: Add logger
-#       Add Parabola fit (with SciPy?)
+
+class Logger(object):
+    # redirect stdout (and thus print() function) to logfile *and* terminal
+    # http://stackoverflow.com/a/616672
+    # and
+    # http://mail.python.org/pipermail/python-list/2007-May/438106.html (dead link)
+    
+    def __init__(self, logfilename):
+        self.terminal = sys.stdout
+        self.log = open(logfilename, "a")
+        sys.stdout = self
+    
+    def __del__(self):
+        sys.stdout = self.terminal
+        self.log.close()
+    
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
+        os.fsync(self.log.fileno())
 
 
-#not sure if we need this
 class QHLine(QFrame):
     ### from https://stackoverflow.com/questions/5671354
     def __init__(self):
@@ -56,7 +78,7 @@ class VerifyMainWindow(QMainWindow):
     ### mouseMoved                  : when the mouse moves in zoom
 
     ### manualPeakToggle            :
-    ### fitData                : fitting parabolic function to the data
+    ### fitData                     : fitting parabolic function to the data
     ### readData
     
     
@@ -728,10 +750,15 @@ if __name__ == "__main__":
             print ("Failed to import NSBundle, couldn't change menubar name." )
             
     __version__ = "v. 0.5"
-    #print (sys.version)
+   
+    timestr = time.strftime("%y%m%d-%H%M%S")
+    Log = Logger(timestr+'_log.txt')        #create logfile
+    
     app = QApplication([])
     vmw = VerifyMainWindow()
     vmw.show()
     sys.exit(app.exec_())
+
+    del Log
 
 ##### export QT_MAC_WANTS_LAYER=1 in the Terminal might be needed to see the app
