@@ -19,8 +19,8 @@ pyobjc==7.2
 
 Clone from here, change to directory:
 
-`conda create --name veriqt Python=3.8 && conda activate veriqt
-code pip install -r requirements.txt`
+`conda create --name veriqt Python=3.8 && conda activate veriqt`
+`code pip install -r requirements.txt`
 
 old version (branch main with Tkinter) was tested and running under:
 
