@@ -17,11 +17,16 @@ numpy==1.19.2
 scipy==1.6.3
 pyobjc==7.2
 
-Clone from here, change to directory:
+Clone from here, move to directory and issue (with up-to-date pip):
 
 `conda create --name veriqt Python=3.8 && conda activate veriqt`
 
 `code pip install -r requirements.txt`
+
+then
+
+`python vqt.py` 
+to launch
 
 old version (branch main with Tkinter) was tested and running under:
 
