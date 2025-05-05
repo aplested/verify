@@ -287,7 +287,7 @@ class VerifyMainWindow(QMainWindow):
         self.plots = pg.GraphicsLayoutWidget()
         self.p1rc = (1,0)
         self.p1 = self.plots.addPlot(y=data, row=self.p1rc[0], col=self.p1rc[1], rowspan=3, colspan=1)
-        self.p1.setTitle(title="Traces", color="F0F0F0", justify="right")
+        self.p1.setTitle(title="All traces in file", color="F0F0F0", justify="right")
         self.p1.setLabel('left', "Current(pA)")
         self.p1.setLabel('bottom', "Samples")
         self.p1.vb.setLimits(xMin=0)
