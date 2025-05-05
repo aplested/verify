@@ -192,7 +192,7 @@ class VerifyMainWindow(QMainWindow):
         self.input_filename_label.setWordWrap(True)
         fileGrid.addWidget(self.input_filename_label, 2, 0, 1, 1)
         
-        fileActions.setFixedWidth(300)
+        fileActions.setFixedWidth(250)
         fileActions.setLayout(fileGrid)
         
         
@@ -368,6 +368,8 @@ class VerifyMainWindow(QMainWindow):
         self.ensVariance = np.array(self.verified_output[1])
         self.meanI = np.array(self.verified_output[0])
         
+        #print (type(self.meanI), type(self.ensVariance))
+        print (self.meanI[::1000], self.ensVariance[::1000])
         self.fitParabolaBtn.setEnabled(True)
     
     
@@ -403,7 +405,7 @@ class VerifyMainWindow(QMainWindow):
             self.verifyTracesBtn.setEnabled(True)    #turn on VERIFY button
             for trace in self.input_traces:
                 self.p1.plot(trace)
-            self.p1.addLabel("All traces in {}".format(self.dfile))
+            self.p1.Label("All traces in {}".format(self.dfile))
             #self.p.drawTrace()
         else:
             self.input_filename_label.set('No data loaded')
@@ -429,9 +431,10 @@ class VerifyMainWindow(QMainWindow):
         elif opt == 0:
             out_filename = file_tools.addFilenamePrefix(self.dfile, prefix=datetime.now().strftime("%y%m%d-%H%M%S") + "_v_")
         """
-        #self.b5.config(state=NORMAL)
+        
         self.p2.clear()
-        self.p2.plot(self.verified_output[0], self.verified_output[1], pen=(3))
+        #print (len(self.verified_output[0]))
+        self.p2.plot(self.meanI, self.ensVariance, pen=(3))
         
         write_output (self.verified_output, self.output_header, out_filename)
     

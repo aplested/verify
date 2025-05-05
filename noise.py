@@ -19,8 +19,19 @@ from file_tools import file_read, file_write, traces_into_lines, lines_into_trac
 
 def square (x): return x*x
 
+def mean_baseline_sub(traces, b_start=0, b_end=99):
+    """called if traces are positive going
+     get mean current waveform and subtract baseline"""
+
+    mean = traces_average(traces)
+
+    mean_bs_sub = baseline_subtract(mean, b_start, b_end)
+    
+    return mean_bs_sub
+
 def mean_inverse_baseline_sub(traces, b_start=0, b_end=99):
-	"""get mean current waveform, invert for positive and subtract baseline"""
+	"""called if traces are negative going
+    get mean current waveform, invert for positive and subtract baseline"""
 
 	mean = traces_average(traces)
 
@@ -161,8 +172,21 @@ def construct_diffs(input_traces, UNITARY_CURRENT=.5, baseline_range=[0,99]):
 def final_prep(input_traces, difference_traces, baseline_range):
     b_start = baseline_range[0]
     b_end = baseline_range[1]
-    ## calculate mean current, invert and subtract baseline
-    final_mean_I_inverted_bs_sub = mean_inverse_baseline_sub(input_traces, b_start, b_end)
+   
+    ## check positive or negative peak
+    #calculate mean current, invert if needed and subtract baseline
+    
+    first_trace = input_traces[0]
+    abs_trace = list(map(abs,first_trace))
+    
+    if max(abs_trace) == max(first_trace):
+        print("Verify detected positive-going first trace.")
+        final_mean_I_bs_sub = mean_baseline_sub(input_traces, b_start, b_end)
+    else :
+        print("Verify detected negative-going first trace.")
+        final_mean_I_bs_sub = mean_inverse_baseline_sub(input_traces, b_start, b_end)
+        
+
 
     final_ensemble_variance = []
 
@@ -177,7 +201,7 @@ def final_prep(input_traces, difference_traces, baseline_range):
         final_ensemble_variance.append(2 * mean_dZt_squared)
     
     ## Add Mean and Ensemble variances to output
-    difference_traces.insert(0, final_mean_I_inverted_bs_sub)
+    difference_traces.insert(0, final_mean_I_bs_sub)
     difference_traces.insert(1, final_ensemble_variance)
 
     return difference_traces

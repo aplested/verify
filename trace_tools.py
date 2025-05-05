@@ -33,7 +33,7 @@ def baseline_subtract (trace, start=0, end=99):
 
 	trace_bs_subtracted = []
 	for point in trace:
-		trace_bs_subtracted.append(point-mean_bs)
+		trace_bs_subtracted.append(point - mean_bs)
 	
 	return trace_bs_subtracted
 
