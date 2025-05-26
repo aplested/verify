@@ -7,8 +7,31 @@ def pred_parabola (I, unitary_i, N):
     
     #vector size of I
     return unitary_i * I - I ** 2 / N
+    
+def double_parabola (I_early, unitary_i_early, I_late, unitary_i_late, N):
+    """parabola should be given by following formula"""
+    ###sigma_2 = i * I - I^2 / N
+    
+   
+    Sigma_2_early = unitary_i_early * I_early - I_early ** 2 / N
+    Sigma_2_late = unitary_i_late * I_late - I_late ** 2 / N
+    
+    #two vectors, size of I_early and I_late
+    return Sigma_2_early, Sigma_2_late
    
 
+def fitDoubleParabola (earlyData, lateData):
+    # when the variance-current plot has two paths, we can fit separately with common N
+    """has guesses built in"""
+    
+    i_guess_early = 1
+    i_guess_late = 0.1
+    N_guess = 10
+    
+    errfunc = lambda guesses: (predDoubleparabola(earlyData[0], guesses[0], guesses[1], lateData[0], guesses[2]) - data[1]) #modify
+    
+    return optimize.least_squares(errfunc, guesses, bounds = (0, np.inf))
+    
 def fitParabola (data):
     """has guesses built in"""
         
@@ -20,7 +43,6 @@ def fitParabola (data):
     errfunc = lambda guesses: (pred_parabola(data[0], guesses[0], guesses[1]) - data[1])
 
     # loss="soft_l1" is bad!
-    # should the limit of CV^2 estimates be 1?
     return optimize.least_squares(errfunc, guesses, bounds = (0, np.inf))
 
     

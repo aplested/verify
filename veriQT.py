@@ -6,12 +6,14 @@ from datetime import datetime
 import time
 #import itertools
 
-#PySide2 imports
+#Old PySide2 imports
 """from PySide2 import QtCore, QtGui
 from PySide2.QtCore import Slot
 from PySide2 import __version__ as pyside_version
 from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QMessageBox, QFileDialog, QAction, QGroupBox, QHBoxLayout, QRadioButton, QDialog, QVBoxLayout, QCheckBox, QButtonGroup, QFrame, QLineEdit
 """
+
+#from now on, we use PySide6 for compatibility with Apple Silicon
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Slot
 from PySide6 import __version__ as pyside_version
@@ -22,15 +24,13 @@ from PySide6.QtWidgets import QPushButton, QApplication, QMainWindow, QWidget, Q
 #package imports
 import numpy as np
 #import pandas as pd
-#from scipy import __version__ as scipy_version
-#import scipy.signal as scsig
 #from openpyxl import Workbook
 #from openpyxl.utils.dataframe import dataframe_to_rows
 
 #verify imports
 import file_tools
 from trace_tools import decimate_traces
-from Plot import *
+#from Plot import *
 from noise import *
 from parabola import fitParabola
 
@@ -764,7 +764,7 @@ if __name__ == "__main__":
     app = QApplication([])
     vmw = VerifyMainWindow()
     vmw.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
     del Log
 
