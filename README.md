@@ -5,15 +5,15 @@ Check the variance of electrophysiological recordings for noise analysis
 ![ScreenShot](/screenshots/veriQt.png) 
 branch python3 is updated for Python3 and MacOS Sequoia but still uses Tkinter
 
-branch vqt is now the main development branch and is updated for Python3, PySide6 and Qt (because Tkinter is limiting and no longer distributed with macOS)
+(May 2025) branch vqt is now the main development branch and is updated for Python3, PySide6 and Qt (because Tkinter is limiting and no longer distributed with macOS)
 
 To run Verify on modern hardware, you need versions of packages that are not bleeding edge (for whatever reason). See requirements.txt
 
-Clone from here, download miniconda (restart your terminal), move to verify directory and issue (with up-to-date pip):
+Clone from here, download and install miniconda (https://www.anaconda.com/download/ don't forget to restart your Terminal), move to the verify directory and issue (with up-to-date pip):
 
 `conda create --name veriqt Python=3.9 && conda activate veriqt`
 
-The following set of packages was tested and working on MacMini M2 Pro (Ventura 13.2.1) M1 Macbook Pro with Sequoia 15.3.2 or M1 Macbook Max with Monterey 12.2.1 (May 2025)
+The following set of packages was tested and working on MacMini M2 Pro (Ventura 13.2.1) M1 Macbook Pro (Sequoia 15.3.2) or M1 Macbook Max (Monterey 12.2.1).
 
 `PySide6==6.6.*`
 
@@ -33,7 +33,11 @@ then
 `python veriQT.py` 
 to launch
 
+When you restart the terminal, enter:
+'conda activate veriQt'
 
+then launch with:
+`python veriQT.py` 
 
 old version (branch main with Tkinter) was tested and running under:
 
